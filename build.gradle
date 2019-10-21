@@ -1,0 +1,36 @@
+plugins {
+    id 'org.springframework.boot' version '2.1.8.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+}
+
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'commons-validator:commons-validator:1.6'
+    implementation 'com.google.guava:guava:28.1-jre'
+
+    runtime 'org.webjars:bootstrap:3.3.5'
+    runtime 'org.webjars:jquery:2.1.4'
+
+    runtime 'org.hsqldb:hsqldb'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.apache.httpcomponents:httpclient'
+}
+
+clean.doFirst {
+    delete "db"
+}
