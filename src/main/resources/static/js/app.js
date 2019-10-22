@@ -14,6 +14,14 @@ $(document).ready(
                             + "'>"
                             + msg.uri
                             + "</a></div>");
+                        
+  
+                        $("#qr-code").html(
+                            "<div class='text-center'>" +
+                                "<img src='https://chart.googleapis.com/chart?cht=qr&chl=" + msg.uri + "&chs=160x160&chld=L|0'" +
+                                    "class='qr-code img-thumbnail img-responsive'> </div>");
+                            
+
                     },
                     error: function () {
                         $("#result").html(
