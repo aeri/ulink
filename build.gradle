@@ -27,6 +27,8 @@ dependencies {
 
     runtime 'org.hsqldb:hsqldb'
 
+    compile 'org.postgresql:postgresql:42.1.1'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.httpcomponents:httpclient'
 }
