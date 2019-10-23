@@ -17,6 +17,7 @@ services:
     volumes:
         - ./src/main/resources/run.sql:/docker-entrypoint-initdb.d/run.sql
         - ./base:/var/lib/postgresql/data
+    container_name: containerdbp
 
     environment:
       POSTGRES_USER: nerea
