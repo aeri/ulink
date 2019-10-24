@@ -54,16 +54,15 @@ public class ClickRepositoryImpl implements ClickRepository {
             jdbc.update(conn -> {
                 PreparedStatement ps = conn
                         .prepareStatement(
-                                "INSERT INTO CLICK VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                                "INSERT INTO CLICK VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?)",
                                 Statement.RETURN_GENERATED_KEYS);
-                ps.setNull(1, Types.BIGINT);
-                ps.setString(2, cl.getHash());
-                ps.setDate(3, cl.getCreated());
-                ps.setString(4, cl.getReferrer());
-                ps.setString(5, cl.getBrowser());
-                ps.setString(6, cl.getPlatform());
-                ps.setString(7, cl.getIp());
-                ps.setString(8, cl.getCountry());
+                ps.setString(1, cl.getHash());
+                ps.setDate(2, cl.getCreated());
+                ps.setString(3, cl.getReferrer());
+                ps.setString(4, cl.getBrowser());
+                ps.setString(5, cl.getPlatform());
+                ps.setString(6, cl.getIp());
+                ps.setString(7, cl.getCountry());
                 return ps;
             }, holder);
             if (holder.getKey() != null) {

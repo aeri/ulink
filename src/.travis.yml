@@ -1,0 +1,27 @@
+sudo: required
+language: java
+jdk: openjdk8
+
+services:
+  - docker
+
+before_install:
+  # install heroku CLI
+  - wget -qO- https://toolbelt.heroku.com/install.sh | sh
+  # login to docker registries (dockerhub + heroku)
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
+
+script:
+  - gradle build
+  - docker build -t ulink-spring .
+  - docker tag ulink-spring registry.heroku.com/$HEROKU_APP_NAME/web
+
+deploy:
+  provider: script
+  script:
+    # push to dockerhub
+    docker push ulink-spring;
+    docker push registry.heroku.com/$HEROKU_APP_NAME/web;
+    heroku container:release web --app $HEROKU_APP_NAME
+  branch: master
