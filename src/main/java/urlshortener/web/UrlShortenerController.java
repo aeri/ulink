@@ -44,6 +44,28 @@ public class UrlShortenerController {
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
                 "https"});
         if (urlValidator.isValid(url)) {
+            HttpHeaders h = new HttpHeaders();
+            //HttpClient client = new DefaultHttpClient();
+            if(true){
+                ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
+                h.setLocation(su.getUri());
+                return new ResponseEntity<>(su, h, HttpStatus.CREATED);
+            }
+            else{
+                return new ResponseEntity<>(null, h, HttpStatus.OK);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/linkConfirm", method = RequestMethod.POST)
+    public ResponseEntity<ShortURL> shortenerConfirm(@RequestParam("url") String url,
+                                              @RequestParam(value = "sponsor", required = false) String sponsor,
+                                              HttpServletRequest request) {
+        UrlValidator urlValidator = new UrlValidator(new String[]{"http",
+                "https"});
+        if (urlValidator.isValid(url)) {
             ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();
             h.setLocation(su.getUri());
