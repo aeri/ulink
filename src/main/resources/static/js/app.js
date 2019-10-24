@@ -3,6 +3,7 @@ $(document).ready(
         $("#shortener").submit(
             function (event) {
                 event.preventDefault();
+                localStorage.setItem("senturl", $(this).serialize());
                 $.ajax({
                     type: "POST",
                     url: "/link",
@@ -10,12 +11,13 @@ $(document).ready(
                     success: function (msg) {
                         if(msg.uri == undefined){
                             $("#result").html(
-                                "<div class='alert alert-warning lead'><a target='_blank' href='"
-                                + msg.uri
-                                + "'>"
-                                + msg.uri
-                                + " LINK MALO"
-                                + "</a></div>");
+                                    "<div>" +
+                                        "<form id='shortenerConfirm' method='post'>" +
+                                            "<button type='submit' class='btn btn-primary'>If you click it fails</button>" +
+                                        "</form>" +
+                                        "<button type='button' class='btn btn-secondary' data-dismiss='modal'>Volver</button>" +
+                                    "</div>");
+                            $("#qr-code").html("<div> </div>");
                         }
                         else{
                             $("#result").html(
@@ -35,6 +37,7 @@ $(document).ready(
                     error: function () {
                         $("#result").html(
                             "<div class='alert alert-danger lead'>ERROR</div>");
+                        $("#qr-code").html("<div> </div>");
                     }
                 });
             });
@@ -46,7 +49,7 @@ $(document).ready(
                 $.ajax({
                     type: "POST",
                     url: "/linkConfirm",
-                    data: $(this).serialize(),
+                    data: localStorage.getItem("senturl"),
                     success: function (msg) {
                         $("#result").html(
                             "<div class='alert alert-success lead'><a target='_blank' href='"
@@ -66,6 +69,7 @@ $(document).ready(
                     error: function () {
                         $("#result").html(
                             "<div class='alert alert-danger lead'>ERROR</div>");
+                        $("#qr-code").html("<div> </div>");
                     }
                 });
             });

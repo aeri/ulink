@@ -1,18 +1,28 @@
 package urlshortener.web;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.net.UnknownHostException;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
 
 @RestController
 public class UrlShortenerController {
@@ -45,15 +55,20 @@ public class UrlShortenerController {
                 "https"});
         if (urlValidator.isValid(url)) {
             HttpHeaders h = new HttpHeaders();
-            //HttpClient client = new DefaultHttpClient();
-            if(true){
+            RestTemplate rest = new RestTemplate();
+            HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
+            try{
+                rest.exchange(url, HttpMethod.GET, requestEntity, String.class); // Execute http get request as client
                 ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
                 h.setLocation(su.getUri());
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
             }
-            else{
+            catch(ResourceAccessException e){ // Unknown host
                 return new ResponseEntity<>(null, h, HttpStatus.OK);
             }
+            catch(HttpClientErrorException e){ // Client error
+                return new ResponseEntity<>(null, h, HttpStatus.OK);
+            }  
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
