@@ -15,6 +15,7 @@ public class ShortURL {
     private Boolean safe;
     private String ip;
     private String country;
+    private Boolean confirmed;
 
     public ShortURL(String hash, String target, URI uri, String sponsor,
                     Date created, String owner, Integer mode, Boolean safe, String ip,
@@ -29,6 +30,21 @@ public class ShortURL {
         this.safe = safe;
         this.ip = ip;
         this.country = country;
+        this.confirmed = true;
+    }
+
+    public ShortURL(String target, Boolean confirmed) {
+        this.hash = null;
+        this.target = target;
+        this.uri = null;
+        this.sponsor = null;
+        this.created = null;
+        this.owner = null;
+        this.mode = null;
+        this.safe = null;
+        this.ip = null;
+        this.country = null;
+        this.confirmed = confirmed;
     }
 
     public ShortURL() {
@@ -72,6 +88,10 @@ public class ShortURL {
 
     public String getCountry() {
         return country;
+    }
+
+    public Boolean getConfirmed() {
+        return confirmed;
     }
 
 }
