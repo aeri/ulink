@@ -14,14 +14,14 @@ before_install:
 
 script:
   - gradle build
-  - docker build -t ulink-spring .
-  - docker tag ulink-spring registry.heroku.com/$HEROKU_APP_NAME/web
+  - docker build -t javiermixture/ulink .
+  - docker tag javiermixture/ulink registry.heroku.com/$HEROKU_APP_NAME/web
 
 deploy:
   provider: script
   script:
     # push to dockerhub
-    docker push ulink-spring;
+    docker push javiermixture/ulink;
     docker push registry.heroku.com/$HEROKU_APP_NAME/web;
     heroku container:release web --app $HEROKU_APP_NAME
   branch: master
