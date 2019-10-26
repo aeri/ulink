@@ -58,16 +58,32 @@ public class UrlShortenerController {
             RestTemplate rest = new RestTemplate();
             HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
             try{
-                rest.exchange(url, HttpMethod.GET, requestEntity, String.class); // Execute http get request as client
+                ResponseEntity<String> response = rest.exchange(url, HttpMethod.GET, requestEntity, String.class); // Execute http get request as client
+                System.out.println("Status code: " + response.getStatusCode());
                 ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
                 h.setLocation(su.getUri());
+                System.out.println("Peticion correcta");
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
             }
             catch(ResourceAccessException e){ // Unknown host
-                return new ResponseEntity<>(null, h, HttpStatus.OK);
+                System.out.println(e.getMessage());
+                System.out.println("Peticion incorrecta ResourceAccessException");
+                ShortURL su = new ShortURL(url, false);
+                return new ResponseEntity<>(su, h, HttpStatus.OK);
             }
             catch(HttpClientErrorException e){ // Client error
-                return new ResponseEntity<>(null, h, HttpStatus.OK);
+                System.out.println(e.getMessage());
+                if(e.getRawStatusCode() == 404){
+                    System.out.println("Peticion incorrecta HttpClientErrorException");
+                    ShortURL su = new ShortURL(url, false);
+                    return new ResponseEntity<>(su, h, HttpStatus.OK);
+                }
+                else{
+                    ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
+                h.setLocation(su.getUri());
+                System.out.println("Peticion correcta");
+                return new ResponseEntity<>(su, h, HttpStatus.CREATED);
+                }  
             }  
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -78,6 +94,7 @@ public class UrlShortenerController {
     public ResponseEntity<ShortURL> shortenerConfirm(@RequestParam("url") String url,
                                               @RequestParam(value = "sponsor", required = false) String sponsor,
                                               HttpServletRequest request) {
+        System.out.println("linkConfirm Request");
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
                 "https"});
         if (urlValidator.isValid(url)) {
