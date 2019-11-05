@@ -18,7 +18,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
+    implementation 'org.freemarker:freemarker'
+    implementation 'org.springframework:spring-context-support'
+    
     implementation 'commons-validator:commons-validator:1.6'
     implementation 'com.google.guava:guava:28.1-jre'
 
@@ -31,6 +33,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.httpcomponents:httpclient'
+    compile 'com.google.apis:google-api-services-safebrowsing:v4-rev107-1.25.0'
 }
 
 clean.doFirst {

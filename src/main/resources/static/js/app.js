@@ -10,20 +10,33 @@ $(document).ready(
                     data: $(this).serialize(),
                     success: function (msg) {
                         if(!msg.confirmed){
-                            $("#result").html(
-                                        "<form action='' class='col-lg-12' id='shortenerConfirm' role='form'>" +
-                                            "<button class='btn btn-primary' type='submit'>If you click it fails</button>" +
-                                        "</form>" +
-                                        "<button type='button' class='btn btn-secondary'>Volver</button>" +
-                                    "<div class='alert alert-warning lead'><a target='_blank' href='"
-                                    + msg.target
-                                    + "'>"
-                                    + msg.target
-                                    + "</a></div>"
-                                    + "<div><button type='button' class='confirm-button'>Confirm</button></div>");
+                            $("#result").html("<div> </div>");
                             $("#qr-code").html("<div> </div>");
+                            $("#modal").html(
+                                "<div class='modal' id='confirmationModal' tabindex='-1' role='dialog'>"
+                                + "<div class='modal-dialog' role='document'>"
+                                + "<div class='modal-content'>"
+                                + "<div class='modal-header'>"
+                                + "<h3 class='modal-title'>Warning</h3>"
+                                + "</div>"
+                                + "<div class='modal-body'>"
+                                + "<p>Submitted URL may not be reachable. Do you still want to shorten it?</p>"
+                                + "</div>"
+                                + "<div class='modal-footer'>"
+                                + "<form action='' class='col-lg-12' id='shortenerConfirm' role='form'>"
+                                + "<button type='button' class='btn btn-secondary' data-dismiss='modal'>Cancel</button>"
+                                + "<button type='submit' class='btn btn-primary'>Confirm</button>"
+                                + "</form>"
+                                + "</div>"
+                                + "</div>"
+                                + "</div>"
+                                + "</div>");
+                            $("#confirmationModal").modal();
                         }
                         else{
+                            $('#confirmationModal').hide();
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').remove();
                             $("#result").html(
                                 "<div class='alert alert-success lead'><a target='_blank' href='"
                                 + msg.uri
@@ -39,6 +52,10 @@ $(document).ready(
                             
                     },
                     error: function () {
+                        $('#confirmationModal').hide();
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                        $("#modal").html("<div> </div>");
                         $("#result").html(
                             "<div class='alert alert-danger lead'>ERROR</div>");
                         $("#qr-code").html("<div> </div>");
@@ -52,6 +69,10 @@ $(document).ready(
                 url: "/linkConfirm",
                 data: localStorage.getItem("senturl"),
                 success: function (msg) {
+                    $('#confirmationModal').hide();
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                    $("#modal").html("<div> </div>");
                     $("#result").html(
                         "<div class='alert alert-success lead'><a target='_blank' href='"
                         + msg.uri
@@ -68,12 +89,30 @@ $(document).ready(
 
                 },
                 error: function () {
+                    $('#confirmationModal').hide();
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                    $("#modal").html("<div> </div>");
                     $("#result").html(
                         "<div class='alert alert-danger lead'>ERROR</div>");
                     $("#qr-code").html("<div> </div>");
                 }
             });
         });
+        $("#stadistics").submit(
+            function (event) {
+                event.preventDefault();
+                $.ajax({
+                    type: "GET",
+                    url: "/stadistics",
+                    success: function (msg) { 
+                            
+                    },
+                    error: function () {
+                       
+                    }
+                });
+            });
         }
     );
 
