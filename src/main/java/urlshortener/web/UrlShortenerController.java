@@ -20,13 +20,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
-
 
 @RestController
 public class UrlShortenerController {
@@ -41,7 +42,8 @@ public class UrlShortenerController {
     public static final String GOOGLE_CLIENT_ID = "1"; // client id
     public static final String GOOGLE_CLIENT_VERSION = "0.0.1"; // client version
     public static final String GOOGLE_APPLICATION_NAME = "ulink"; // appication name
-    public static final List<String> GOOGLE_THREAT_TYPES = Arrays.asList("MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION");
+    public static final List<String> GOOGLE_THREAT_TYPES = Arrays.asList("MALWARE", "SOCIAL_ENGINEERING",
+            "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION");
     public static final List<String> GOOGLE_PLATFORM_TYPES = Arrays.asList("ANY_PLATFORM");
     public static final List<String> GOOGLE_THREAT_ENTRYTYPES = Arrays.asList("URL");
     public static NetHttpTransport httpTransport;
@@ -59,23 +61,22 @@ public class UrlShortenerController {
 
         FindThreatMatchesRequest findThreatMatchesRequest = createFindThreatMatchesRequest(urls);
 
-        Safebrowsing.Builder safebrowsingBuilder = new Safebrowsing.Builder(httpTransport, GOOGLE_JSON_FACTORY, null).setApplicationName(GOOGLE_APPLICATION_NAME);
+        Safebrowsing.Builder safebrowsingBuilder = new Safebrowsing.Builder(httpTransport, GOOGLE_JSON_FACTORY, null)
+                .setApplicationName(GOOGLE_APPLICATION_NAME);
         Safebrowsing safebrowsing = safebrowsingBuilder.build();
 
-        FindThreatMatchesResponse findThreatMatchesResponse = safebrowsing.threatMatches().find(findThreatMatchesRequest).setKey(GOOGLE_API_KEY.getProperty("google.api_key")).execute();
+        FindThreatMatchesResponse findThreatMatchesResponse = safebrowsing.threatMatches()
+                .find(findThreatMatchesRequest).setKey(GOOGLE_API_KEY.getProperty("google.api_key")).execute();
 
         List<ThreatMatch> threatMatches = findThreatMatchesResponse.getMatches();
 
         if (threatMatches != null && threatMatches.size() > 0) {
             return threatMatches.get(0).getThreatType();
-        }
-        else{
+        } else {
             return "";
         }
 
-
     }
-
 
     private FindThreatMatchesRequest createFindThreatMatchesRequest(List<String> urls) {
         FindThreatMatchesRequest findThreatMatchesRequest = new FindThreatMatchesRequest();
@@ -103,10 +104,8 @@ public class UrlShortenerController {
         return findThreatMatchesRequest;
     }
 
-
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
-    public ResponseEntity<?> redirectTo(@PathVariable String id,
-                                        HttpServletRequest request){
+    public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
 
         if (l != null) {
@@ -114,13 +113,12 @@ public class UrlShortenerController {
 
             try {
                 notSafe = CheckGSB(l.getTarget());
-                if(notSafe != ""){
+                if (notSafe != "") {
                     clickService.saveClick(id, extractIP(request));
                     HttpHeaders h = new HttpHeaders();
                     h.setLocation(URI.create("/warning"));
                     return new ResponseEntity<>(h, HttpStatus.PERMANENT_REDIRECT);
-                }
-                else{
+                } else {
                     clickService.saveClick(id, extractIP(request));
                     return createSuccessfulRedirectToResponse(l);
                 }
@@ -145,7 +143,9 @@ public class UrlShortenerController {
                 "https"});
         if (urlValidator.isValid(url)) {
             HttpHeaders h = new HttpHeaders();
-            RestTemplate rest = new RestTemplate();
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+            RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(500))
+            .setReadTimeout(Duration.ofSeconds(500)).build();
             HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
             try{
                 ResponseEntity<String> response = rest.exchange(url, HttpMethod.GET, requestEntity, String.class); // Execute http get request as client
