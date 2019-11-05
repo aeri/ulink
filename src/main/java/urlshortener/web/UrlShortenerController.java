@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -47,6 +48,21 @@ public class UrlShortenerController {
     public static final List<String> GOOGLE_PLATFORM_TYPES = Arrays.asList("ANY_PLATFORM");
     public static final List<String> GOOGLE_THREAT_ENTRYTYPES = Arrays.asList("URL");
     public static NetHttpTransport httpTransport;
+    
+    private static Pattern pDomainNameOnly;
+	private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
+    
+	static {
+		pDomainNameOnly = Pattern.compile(DOMAIN_NAME_PATTERN);
+	}
+	
+
+	private static boolean isValidDomainName(String domainName) {
+		return pDomainNameOnly.matcher(domainName).find();
+	}
+
+    
+    
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -140,12 +156,18 @@ public class UrlShortenerController {
                                               @RequestParam(value = "sponsor", required = false) String sponsor,
                                               HttpServletRequest request) {
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
-                "https"});
+                "https", "ftp"});     
+        
+        if  (isValidDomainName(url)) {
+        	url = "http://" + url ;
+        }
+        
         if (urlValidator.isValid(url)) {
             HttpHeaders h = new HttpHeaders();
             RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-            RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(500))
-            .setReadTimeout(Duration.ofSeconds(500)).build();
+            
+            RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(300))
+            .setReadTimeout(Duration.ofMillis(300)).build();
             HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
             try{
                 ResponseEntity<String> response = rest.exchange(url, HttpMethod.GET, requestEntity, String.class); // Execute http get request as client

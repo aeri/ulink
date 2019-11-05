@@ -44,7 +44,11 @@ public class ShortURLBuilder {
 
     ShortURLBuilder target(String url) {
         target = url;
-        hash = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+        
+        //RandomHash rand= new RandomHash();
+        //hash = rand.hash();
+        SecureHash rand= new SecureHash();
+        hash = rand.generateRandomString(6, url);
         return this;
     }
 
