@@ -24,14 +24,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
 
 @RestController
 public class UrlShortenerController {
     private final ShortURLService shortUrlService;
 
     private final ClickService clickService;
-    @Value("${google.api_key}")
-    private String GOOGLE_API_KEY;
+
+    @Autowired
+    private Environment GOOGLE_API_KEY;
 
     public static final JacksonFactory GOOGLE_JSON_FACTORY = JacksonFactory.getDefaultInstance();
     public static final String GOOGLE_CLIENT_ID = "1"; // client id
@@ -57,7 +61,8 @@ public class UrlShortenerController {
 
         Safebrowsing.Builder safebrowsingBuilder = new Safebrowsing.Builder(httpTransport, GOOGLE_JSON_FACTORY, null).setApplicationName(GOOGLE_APPLICATION_NAME);
         Safebrowsing safebrowsing = safebrowsingBuilder.build();
-        FindThreatMatchesResponse findThreatMatchesResponse = safebrowsing.threatMatches().find(findThreatMatchesRequest).setKey(GOOGLE_API_KEY).execute();
+
+        FindThreatMatchesResponse findThreatMatchesResponse = safebrowsing.threatMatches().find(findThreatMatchesRequest).setKey(GOOGLE_API_KEY.getProperty("google.api_key")).execute();
 
         List<ThreatMatch> threatMatches = findThreatMatchesResponse.getMatches();
 
@@ -109,22 +114,22 @@ public class UrlShortenerController {
 
             try {
                 notSafe = CheckGSB(l.getTarget());
+                if(notSafe != ""){
+                    clickService.saveClick(id, extractIP(request));
+                    HttpHeaders h = new HttpHeaders();
+                    h.setLocation(URI.create("/stadistics"));
+                    return new ResponseEntity<>(h, HttpStatus.PERMANENT_REDIRECT);
+                }
+                else{
+                    clickService.saveClick(id, extractIP(request));
+                    return createSuccessfulRedirectToResponse(l);
+                }
             } catch (GeneralSecurityException e) {
                 e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-
-
-            if(notSafe != ""){
-                clickService.saveClick(id, extractIP(request));
-                HttpHeaders h = new HttpHeaders();
-                h.setLocation(URI.create("http://google.com"));
-                return new ResponseEntity<>(h, HttpStatus.PERMANENT_REDIRECT);
-            }
-            else{
-                clickService.saveClick(id, extractIP(request));
-                return createSuccessfulRedirectToResponse(l);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
         } else {
