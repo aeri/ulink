@@ -31,4 +31,11 @@ public class TemplateEngineController {
         return modelAndView;
     }
 
+    @GetMapping("/warning")
+    public ModelAndView warning(HttpServletRequest request) {
+        ModelAndView modelAndView;
+        modelAndView = new ModelAndView("warning");
+        return modelAndView;
+    }
+
 }

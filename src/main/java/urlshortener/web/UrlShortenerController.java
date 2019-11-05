@@ -142,7 +142,7 @@ public class UrlShortenerController {
                 if (notSafe != "") {
                     clickService.saveClick(id, extractIP(request));
                     HttpHeaders h = new HttpHeaders();
-                    h.setLocation(URI.create("/stadistics"));
+                    h.setLocation(URI.create("/warning"));
                     return new ResponseEntity<>(h, HttpStatus.PERMANENT_REDIRECT);
                 } else {
                     clickService.saveClick(id, extractIP(request));
