@@ -16,8 +16,16 @@ import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 
+import io.ipinfo.api.IPInfo;
+
+import io.ipinfo.api.errors.RateLimitedException;
+import io.ipinfo.api.model.IPResponse;
+
 import javax.servlet.http.HttpServletRequest;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
@@ -29,6 +37,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 
 @RestController
 public class UrlShortenerController {
@@ -38,6 +47,9 @@ public class UrlShortenerController {
 
     @Autowired
     private Environment GOOGLE_API_KEY;
+
+    @Autowired
+    private Environment IPINFO_TOKEN;
 
     public static final JacksonFactory GOOGLE_JSON_FACTORY = JacksonFactory.getDefaultInstance();
     public static final String GOOGLE_CLIENT_ID = "1"; // client id
@@ -123,6 +135,20 @@ public class UrlShortenerController {
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
+
+        IPInfo ipInfo;
+        try {          
+            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).build();
+
+            System.out.println("Redirection requested from " + request.getRemoteAddr());
+            IPResponse response = ipInfo.lookupIP(request.getRemoteAddr()); // Only works for external IPs
+
+            // Print out the country code
+            System.out.println("country code= " + response.getCountryCode());
+        } catch (RateLimitedException ex) {
+            System.out.println("RateLimitedException");
+            // Handle rate limits here.
+        }
 
         if (l != null) {
             String notSafe = null;
