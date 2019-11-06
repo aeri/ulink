@@ -38,4 +38,11 @@ public class TemplateEngineController {
         return modelAndView;
     }
 
+    @GetMapping("/link-stats-access")
+    public ModelAndView linkStatsAccess(HttpServletRequest request) {
+        ModelAndView modelAndView;
+        modelAndView = new ModelAndView("link-stats-access");
+        return modelAndView;
+    }
+
 }
