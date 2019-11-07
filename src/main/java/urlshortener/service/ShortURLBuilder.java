@@ -22,6 +22,7 @@ public class ShortURLBuilder {
     private Boolean safe;
     private String ip;
     private String country;
+    private String code;
 
     static ShortURLBuilder newInstance() {
         return new ShortURLBuilder();
@@ -38,7 +39,8 @@ public class ShortURLBuilder {
                 mode,
                 safe,
                 ip,
-                country
+                country,
+                code
         );
     }
 
@@ -91,4 +93,11 @@ public class ShortURLBuilder {
         this.uri = extractor.apply(hash);
         return this;
     }
+
+    ShortURLBuilder code() {
+        SecureHash rand= new SecureHash();
+        code = rand.generateRandomString(4, null);
+        return this;
+    }
+
 }

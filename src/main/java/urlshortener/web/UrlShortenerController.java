@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
@@ -190,18 +191,28 @@ public class UrlShortenerController {
         
         if (urlValidator.isValid(url)) {
             HttpHeaders h = new HttpHeaders();
-            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-            
-            RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(300))
-            .setReadTimeout(Duration.ofMillis(300)).build();
-            HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
             try{
-                ResponseEntity<String> response = rest.exchange(url, HttpMethod.GET, requestEntity, String.class); // Execute http get request as client
+                RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+                
+                RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(300))
+                .setReadTimeout(Duration.ofMillis(300)).build();
+                HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
+        
+
+                ResponseEntity<String> response = getResponse(rest, url, requestEntity);
+                
+                
                 System.out.println("Status code: " + response.getStatusCode());
                 ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
                 h.setLocation(su.getUri());
                 System.out.println("Peticion correcta");
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
+            } 
+            catch(SocketTimeoutException e){ // Timeout
+                System.out.println(e.getMessage());
+                System.out.println("Peticion incorrecta Timeout");
+                ShortURL su = new ShortURL(url, false);
+                return new ResponseEntity<>(su, h, HttpStatus.OK);
             }
             catch(ResourceAccessException e){ // Unknown host
                 System.out.println(e.getMessage());
@@ -222,10 +233,15 @@ public class UrlShortenerController {
                 System.out.println("Peticion correcta");
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
                 }  
-            }  
+            }                   
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    ResponseEntity<String> getResponse(RestTemplate rest, String url, HttpEntity<String> requestEntity) throws SocketTimeoutException{
+        // Execute http get request as client
+        return rest.exchange(url, HttpMethod.GET, requestEntity, String.class);
     }
 
     @RequestMapping(value = "/linkConfirm", method = RequestMethod.POST)
@@ -234,7 +250,11 @@ public class UrlShortenerController {
                                               HttpServletRequest request) {
         System.out.println("linkConfirm Request");
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
-                "https"});
+                "https", "ftp"});     
+        
+        if  (isValidDomainName(url)) {
+        	url = "http://" + url ;
+        }
         if (urlValidator.isValid(url)) {
             ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();

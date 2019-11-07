@@ -15,7 +15,8 @@ CREATE TABLE SHORTURL
     MODE    INTEGER,                 -- Redirect mode
     SAFE    BOOLEAN,                 -- Safe target
     IP      VARCHAR(20),             -- IP
-    COUNTRY VARCHAR(50)              -- Country
+    COUNTRY VARCHAR(50),             -- Country
+    CODE    VARCHAR(50)              -- Access code
 );
 
 -- Click

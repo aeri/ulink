@@ -42,7 +42,11 @@ $(document).ready(
                                 + msg.uri
                                 + "'>"
                                 + msg.uri
-                                + "</a></div>");
+                                + "</a></div>"
+                                + "<br>"
+                                + "<p>"
+                                + msg.code
+                                + "</p>");
                             
                             $("#qr-code").html(
                                 "<div class='text-center'>" +
@@ -78,7 +82,11 @@ $(document).ready(
                         + msg.uri
                         + "'>"
                         + msg.uri
-                        + "</a></div>");
+                        + "</a></div>"
+                        + "<br>"
+                        + "<p>"
+                        + msg.code
+                        + "</p>");
                     
 
                     $("#qr-code").html(
