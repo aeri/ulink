@@ -320,6 +320,23 @@ public class UrlShortenerController {
     }
 
 
+    @PostMapping("/linkStats")
+    public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl,
+                                    @RequestParam("code") String code,  HttpServletRequest request) {
+        ModelAndView modelAndView;
+        modelAndView = new ModelAndView("stadistics");
+        // Add single Object example
+        modelAndView.addObject("title", "my link stadistics");
+        // Add list example
+        List<String> myWordsList = new ArrayList<>();
+        myWordsList.add("shortened url & code");
+        myWordsList.add(shortenedUrl);
+        myWordsList.add(code);
+        modelAndView.addObject("words", myWordsList);
+        return modelAndView;
+    }
+
+
 
 
 }
