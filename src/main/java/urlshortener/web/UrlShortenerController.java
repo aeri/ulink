@@ -8,10 +8,13 @@ import com.google.api.services.safebrowsing.Safebrowsing;
 import com.google.api.services.safebrowsing.model.*;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
+
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
@@ -40,7 +43,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 
-@RestController
+@Controller
 public class UrlShortenerController {
     private final ShortURLService shortUrlService;
 
@@ -134,7 +137,7 @@ public class UrlShortenerController {
     }
 
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
-    public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
+    public ModelAndView redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
 
         IPInfo ipInfo;
@@ -150,6 +153,12 @@ public class UrlShortenerController {
             System.out.println("RateLimitedException");
             // Handle rate limits here.
         }
+        catch (Exception e) {
+        	System.out.println(e.toString());
+            ModelAndView model = new ModelAndView();
+            model.setStatus(HttpStatus.NOT_FOUND);
+            return model;
+        }
 
         if (l != null) {
             String notSafe = null;
@@ -159,26 +168,41 @@ public class UrlShortenerController {
                 if (notSafe != "") {
                     clickService.saveClick(id, extractIP(request));
                     HttpHeaders h = new HttpHeaders();
-                    h.setLocation(URI.create("/warning"));
-                    return new ResponseEntity<>(h, HttpStatus.PERMANENT_REDIRECT);
+                    
+                    ModelAndView modelAndView = new ModelAndView("warning");
+                    
+                    
+                    modelAndView.addObject("malware", notSafe);
+                    modelAndView.addObject("link", l.getTarget());
+                    
+                    return modelAndView;
+                    
                 } else {
                     clickService.saveClick(id, extractIP(request));
-                    return createSuccessfulRedirectToResponse(l);
+                    return new ModelAndView("redirect:"+l.getTarget());
                 }
             } catch (GeneralSecurityException e) {
                 e.printStackTrace();
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                ModelAndView model = new ModelAndView("error");
+                model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                return model;
             } catch (IOException e) {
                 e.printStackTrace();
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                ModelAndView model = new ModelAndView("error");
+                model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                return model;
             }
+            
 
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        	ModelAndView model = new ModelAndView("error");
+            model.setStatus(HttpStatus.NOT_FOUND);
+            return model;
         }
     }
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
+    @ResponseBody
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
                                               @RequestParam(value = "sponsor", required = false) String sponsor,
                                               HttpServletRequest request) {
@@ -194,8 +218,8 @@ public class UrlShortenerController {
             try{
                 RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
                 
-                RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(300))
-                .setReadTimeout(Duration.ofMillis(300)).build();
+                RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(100))
+                .setReadTimeout(Duration.ofMillis(100)).build();
                 HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
         
 
@@ -245,6 +269,7 @@ public class UrlShortenerController {
     }
 
     @RequestMapping(value = "/linkConfirm", method = RequestMethod.POST)
+    @ResponseBody
     public ResponseEntity<ShortURL> shortenerConfirm(@RequestParam("url") String url,
                                               @RequestParam(value = "sponsor", required = false) String sponsor,
                                               HttpServletRequest request) {
@@ -268,12 +293,33 @@ public class UrlShortenerController {
     private String extractIP(HttpServletRequest request) {
         return request.getRemoteAddr();
     }
-
-    private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
-        HttpHeaders h = new HttpHeaders();
-        h.setLocation(URI.create(l.getTarget()));
-        return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
+    
+    
+    @GetMapping("/stadistics")
+    public ModelAndView stadistics(HttpServletRequest request) {
+        System.out.println("global stadistics");
+        ModelAndView modelAndView;
+        modelAndView = new ModelAndView("stadistics");
+        // Add single Object example
+        modelAndView.addObject("title", "ulink Global Stadistics from ftl");
+        // Add list example
+        List<String> myWordsList = new ArrayList<>();
+        myWordsList.add("hello");
+        myWordsList.add("world");
+        myWordsList.add("example");
+        modelAndView.addObject("words", myWordsList);
+        return modelAndView;
     }
+
+
+    @GetMapping("/link-stats-access")
+    public ModelAndView linkStatsAccess(HttpServletRequest request) {
+        ModelAndView modelAndView;
+        modelAndView = new ModelAndView("link-stats-access");
+        return modelAndView;
+    }
+
+
 
 
 }
