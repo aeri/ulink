@@ -153,12 +153,7 @@ public class UrlShortenerController {
             System.out.println("RateLimitedException");
             // Handle rate limits here.
         }
-        catch (Exception e) {
-        	System.out.println(e.toString());
-            ModelAndView model = new ModelAndView();
-            model.setStatus(HttpStatus.NOT_FOUND);
-            return model;
-        }
+
 
         if (l != null) {
             String notSafe = null;
@@ -218,8 +213,8 @@ public class UrlShortenerController {
             try{
                 RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
                 
-                RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(100))
-                .setReadTimeout(Duration.ofMillis(100)).build();
+                RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
+                .setReadTimeout(Duration.ofMillis(700)).build();
                 HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
         
 
@@ -227,7 +222,7 @@ public class UrlShortenerController {
                 
                 
                 System.out.println("Status code: " + response.getStatusCode());
-                ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
+                ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
                 h.setLocation(su.getUri());
                 System.out.println("Peticion correcta");
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -252,7 +247,7 @@ public class UrlShortenerController {
                     return new ResponseEntity<>(su, h, HttpStatus.OK);
                 }
                 else{
-                    ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
+                    ShortURL su = shortUrlService.save(url,  request.getRemoteAddr());
                 h.setLocation(su.getUri());
                 System.out.println("Peticion correcta");
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -281,7 +276,7 @@ public class UrlShortenerController {
         	url = "http://" + url ;
         }
         if (urlValidator.isValid(url)) {
-            ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
+            ShortURL su = shortUrlService.save(url,  request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();
             h.setLocation(su.getUri());
             return new ResponseEntity<>(su, h, HttpStatus.CREATED);

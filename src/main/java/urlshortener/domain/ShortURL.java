@@ -8,29 +8,21 @@ public class ShortURL {
     private String hash;
     private String target;
     private URI uri;
-    private String sponsor;
     private Date created;
-    private String owner;
-    private Integer mode;
     private Boolean safe;
     private String ip;
-    private String country;
     private Boolean confirmed;
     private String code;
 
-    public ShortURL(String hash, String target, URI uri, String sponsor,
-                    Date created, String owner, Integer mode, Boolean safe, String ip,
-                    String country, String code) {
+    public ShortURL(String hash, String target, URI uri,
+                    Date created, Boolean safe, String ip,
+                    String code) {
         this.hash = hash;
         this.target = target;
         this.uri = uri;
-        this.sponsor = sponsor;
         this.created = created;
-        this.owner = owner;
-        this.mode = mode;
         this.safe = safe;
         this.ip = ip;
-        this.country = country;
         this.confirmed = true;
         this.code = code;
     }
@@ -39,13 +31,9 @@ public class ShortURL {
         this.hash = null;
         this.target = target;
         this.uri = null;
-        this.sponsor = null;
         this.created = null;
-        this.owner = null;
-        this.mode = null;
         this.safe = null;
         this.ip = null;
-        this.country = null;
         this.confirmed = confirmed;
         this.code = null;
     }
@@ -69,28 +57,12 @@ public class ShortURL {
         return created;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
-    public Integer getMode() {
-        return mode;
-    }
-
-    public String getSponsor() {
-        return sponsor;
-    }
-
     public Boolean getSafe() {
         return safe;
     }
 
     public String getIP() {
         return ip;
-    }
-
-    public String getCountry() {
-        return country;
     }
 
     public Boolean getConfirmed() {

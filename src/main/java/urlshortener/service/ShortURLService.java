@@ -21,17 +21,13 @@ public class ShortURLService {
         return shortURLRepository.findByKey(id);
     }
 
-    public ShortURL save(String url, String sponsor, String ip) {
+    public ShortURL save(String url, String ip) {
         ShortURL su = ShortURLBuilder.newInstance()
                 .target(url)
                 .uri((String hash) -> linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri())
-                .sponsor(sponsor)
                 .createdNow()
-                .randomOwner()
-                .temporaryRedirect()
                 .treatAsSafe()
                 .ip(ip)
-                .unknownCountry()
                 .code()
                 .build();
         return shortURLRepository.save(su);
