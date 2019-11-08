@@ -142,13 +142,15 @@ public class UrlShortenerController {
 
         IPInfo ipInfo;
         try {          
-            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).build();
+            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new File("src/main/resources/en_US.json")).build();
 
             System.out.println("Redirection requested from " + request.getRemoteAddr());
-            IPResponse response = ipInfo.lookupIP(request.getRemoteAddr()); // Only works for external IPs
+            IPResponse response = ipInfo.lookupIP("1.1.1.1"); // Only works for external IPs
+            //IPResponse response = ipInfo.lookupIP(request.getRemoteAddr()); // Only works for external IPs
 
             // Print out the country code
             System.out.println("country code= " + response.getCountryCode());
+            System.out.println("country name= " + response.getCountryName());
         } catch (RateLimitedException ex) {
             System.out.println("RateLimitedException");
             // Handle rate limits here.
