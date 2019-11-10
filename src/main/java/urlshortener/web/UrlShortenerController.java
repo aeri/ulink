@@ -141,8 +141,12 @@ public class UrlShortenerController {
         ShortURL l = shortUrlService.findByKey(id);
 
         IPInfo ipInfo;
-        try {          
-            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new File("src/main/resources/en_US.json")).build();
+        try {
+            // Working in local deployment          
+            // ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new File("src/main/resources/en_US.json")).build();
+
+            // Working in Docker deployment
+            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new File("/en_US.json")).build();
 
             System.out.println("Redirection requested from " + request.getRemoteAddr());
             IPResponse response = ipInfo.lookupIP("1.1.1.1"); // Only works for external IPs
