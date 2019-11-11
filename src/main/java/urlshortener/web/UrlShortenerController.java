@@ -189,11 +189,10 @@ public class UrlShortenerController {
 
         IPInfo ipInfo;
         String countryName = null;
+        String countryCode = null;
         String userAgent = request.getHeader("User-Agent");
         String platform = getPlatform(userAgent);
         String browser = getBrowser(userAgent);
-        System.out.println(browser);
-        System.out.println(userAgent);
         try {
             // Working in local deployment
             // ipInfo =
@@ -210,9 +209,8 @@ public class UrlShortenerController {
             // for external IPs
 
             // Print out the country code
-            System.out.println("country code= " + response.getCountryCode());
-            System.out.println("country name= " + response.getCountryName());
             countryName = response.getCountryName();
+            countryCode = response.getCountryCode();
         } catch (RateLimitedException ex) {
             System.out.println("RateLimitedException");
             // Handle rate limits here.
@@ -224,7 +222,7 @@ public class UrlShortenerController {
             try {
                 notSafe = CheckGSB(l.getTarget());
                 if (notSafe != "") {
-                    clickService.saveClick(id, extractIP(request), countryName, platform, browser);
+                    clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser);
                     HttpHeaders h = new HttpHeaders();
 
                     ModelAndView modelAndView = new ModelAndView("warning");
@@ -235,7 +233,7 @@ public class UrlShortenerController {
                     return modelAndView;
 
                 } else {
-                    clickService.saveClick(id, extractIP(request), countryName, platform, browser);
+                    clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser);
                     return new ModelAndView("redirect:" + l.getTarget());
                 }
             } catch (GeneralSecurityException e) {

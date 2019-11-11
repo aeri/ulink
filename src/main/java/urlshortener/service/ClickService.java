@@ -20,9 +20,9 @@ public class ClickService {
         this.clickRepository = clickRepository;
     }
 
-    public void saveClick(String hash, String ip, String countryName, String platform, String browser) {
+    public void saveClick(String hash, String ip, String countryName, String countryCode, String platform, String browser) {
         Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip)
-        .country(countryName).platform(platform).browser(browser).build();
+        .country(countryName).countryCode(countryCode).platform(platform).browser(browser).build();
         cl = clickRepository.save(cl);
         log.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
     }
