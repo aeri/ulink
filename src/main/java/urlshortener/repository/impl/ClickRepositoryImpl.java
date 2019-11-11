@@ -32,17 +32,16 @@ public class ClickRepositoryImpl implements ClickRepository {
             .getLogger(ClickRepositoryImpl.class);
 
     private static final RowMapper<Click> rowMapper = (rs, rowNum) -> new Click(rs.getLong("id"), rs.getString("hash"),
-            rs.getDate("created"), rs.getString("referrer"),
+            rs.getDate("created"),
             rs.getString("browser"), rs.getString("platform"),
-            rs.getString("ip"), rs.getString("country"));
+            rs.getString("ip"), rs.getString("country"), rs.getString("countryCode"));
     
     private static final RowMapper<Country> coMapper = (rs, rowNum) -> new Country(rs.getString("gc"), rs.getString("country"), rs.getInt("count"));
     
     private static final RowMapper<Browser> boMapper = (rs, rowNum) -> new Browser(rs.getString("browser"), rs.getInt("count"));
     
     private static final RowMapper<Platform> ptMapper = (rs, rowNum) -> new Platform(rs.getString("platform"), rs.getInt("count"));
-    
-    
+            
     private JdbcTemplate jdbc;
 
     public ClickRepositoryImpl(JdbcTemplate jdbc) {
@@ -80,13 +79,14 @@ public class ClickRepositoryImpl implements ClickRepository {
             jdbc.update(conn -> {
                 PreparedStatement ps = conn
                         .prepareStatement(
-                                "INSERT INTO CLICK VALUES (DEFAULT, ?, DEFAULT , ?, ?, ?, ?)",
+                                "INSERT INTO CLICK VALUES (DEFAULT, ?, DEFAULT, ?, ?, ?, ?, ?)",
                                 Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, cl.getHash());
                 ps.setString(2, cl.getBrowser());
                 ps.setString(3, cl.getPlatform());
                 ps.setString(4, cl.getIp());
                 ps.setString(5, cl.getCountry());
+                ps.setString(6, cl.getCountryCode());
                 return ps;
             }, holder);
             if (holder.getKey() != null) {
@@ -110,10 +110,10 @@ public class ClickRepositoryImpl implements ClickRepository {
         log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.getId(), cl.getBrowser(), cl.getPlatform(), cl.getCreated());
         try {
             jdbc.update(
-                    "update click set hash=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
-                    cl.getHash(), cl.getCreated(), cl.getReferrer(),
+                    "update click set hash=?, created=?, browser=?, platform=?, ip=?, country=?, countryCode=? where id=?",
+                    cl.getHash(), cl.getCreated(),
                     cl.getBrowser(), cl.getPlatform(), cl.getIp(),
-                    cl.getCountry(), cl.getId());
+                    cl.getCountry(), cl.getCountryCode(), cl.getId());
 
         } catch (Exception e) {
             log.info("When update for id " + cl.getId(), e);
