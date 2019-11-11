@@ -20,6 +20,10 @@ public class ShortURLService {
     public ShortURL findByKey(String id) {
         return shortURLRepository.findByKey(id);
     }
+    
+    public ShortURL findByKeyCode(String id, String code) {
+        return shortURLRepository.findByKeyCode(id,code);
+    }
 
     public ShortURL save(String url, String ip) {
         ShortURL su = ShortURLBuilder.newInstance()

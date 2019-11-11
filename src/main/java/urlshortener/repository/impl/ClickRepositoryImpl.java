@@ -1,5 +1,6 @@
 package urlshortener.repository.impl;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
@@ -9,7 +10,12 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+
+import urlshortener.domain.Browser;
 import urlshortener.domain.Click;
+import urlshortener.domain.Country;
+import urlshortener.domain.Platform;
+import urlshortener.domain.ShortURL;
 import urlshortener.repository.ClickRepository;
 
 import java.sql.PreparedStatement;
@@ -29,7 +35,14 @@ public class ClickRepositoryImpl implements ClickRepository {
             rs.getDate("created"), rs.getString("referrer"),
             rs.getString("browser"), rs.getString("platform"),
             rs.getString("ip"), rs.getString("country"));
-
+    
+    private static final RowMapper<Country> coMapper = (rs, rowNum) -> new Country(rs.getString("gc"), rs.getString("country"), rs.getInt("count"));
+    
+    private static final RowMapper<Browser> boMapper = (rs, rowNum) -> new Browser(rs.getString("browser"), rs.getInt("count"));
+    
+    private static final RowMapper<Platform> ptMapper = (rs, rowNum) -> new Platform(rs.getString("platform"), rs.getInt("count"));
+    
+    
     private JdbcTemplate jdbc;
 
     public ClickRepositoryImpl(JdbcTemplate jdbc) {
@@ -46,6 +59,19 @@ public class ClickRepositoryImpl implements ClickRepository {
             return Collections.emptyList();
         }
     }
+	@Override
+	public List<Country> retrieveCountries(String hash) {
+		
+    	System.out.println(hash);
+		
+		try {
+			return jdbc.query("SELECT COUNT(id), country, gc FROM click WHERE hash=? GROUP BY country,gc ORDER BY COUNT(id) DESC",  new Object[]{hash}, coMapper);
+		} catch (Exception e) {
+			log.debug("When select for key {}", hash, e);
+			return null;
+		}
+	}
+    
 
     @Override
     public Click save(final Click cl) {

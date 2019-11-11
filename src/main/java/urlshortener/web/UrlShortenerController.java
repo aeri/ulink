@@ -15,7 +15,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
+import urlshortener.domain.Country;
 import urlshortener.domain.ShortURL;
+import urlshortener.repository.ClickRepository;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 
@@ -37,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -77,8 +81,6 @@ public class UrlShortenerController {
 		return pDomainNameOnly.matcher(domainName).find();
 	}
 
-    
-    
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -324,10 +326,45 @@ public class UrlShortenerController {
     @PostMapping("/linkStats")
     public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl,
                                     @RequestParam("code") String code,  HttpServletRequest request) {
-        ModelAndView modelAndView;
-        modelAndView = new ModelAndView("stadistics");
+
+    	
+    	String[] amper = shortenedUrl.split("/");
+
+    	
+    	ShortURL l = shortUrlService.findByKeyCode(amper[1], code);
+    	
+    	ModelAndView modelAndView;
+    	    
+        
+    	
+    	if (l == null) {
+    		modelAndView = new ModelAndView("error");
+    		modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+         
+    	}
+    	else {
+        	List<Country> alfa = clickService.retrieveCountries(amper[1]);
+        	
+
+        	final Gson gson = new Gson();
+             	
+        	
+            for(Country model : alfa) {
+                System.out.println(model.getName());
+            }
+
+        	final String rjs = gson.toJson(alfa);
+        	
+        	System.out.println(rjs);
+
+            
+    		
+    		modelAndView = new ModelAndView("map");
+    		modelAndView.addObject("mapdata", rjs);
+    	}
+
         // Add single Object example
-        modelAndView.addObject("title", "my link stadistics");
+
         // Add list example
         List<String> myWordsList = new ArrayList<>();
         myWordsList.add("shortened url & code");

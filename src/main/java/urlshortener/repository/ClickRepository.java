@@ -1,6 +1,7 @@
 package urlshortener.repository;
 
 import urlshortener.domain.Click;
+import urlshortener.domain.Country;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface ClickRepository {
     Long count();
 
     List<Click> list(Long limit, Long offset);
+
+	List<Country> retrieveCountries(String hash);
 }
