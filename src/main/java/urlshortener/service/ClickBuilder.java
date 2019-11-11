@@ -43,14 +43,29 @@ public class ClickBuilder {
         return this;
     }
 
+    ClickBuilder browser(String browser) {
+        this.browser = browser;
+        return this;
+    }
+
     ClickBuilder unknownPlatform() {
         this.platform = null;
+        return this;
+    }
+
+    ClickBuilder platform(String platform) {
+        this.platform = platform;
         return this;
     }
 
 
     ClickBuilder ip(String ip) {
         this.ip = ip;
+        return this;
+    }
+
+    ClickBuilder country(String countryName) {
+        this.country = countryName;
         return this;
     }
 

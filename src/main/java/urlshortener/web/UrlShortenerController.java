@@ -64,21 +64,17 @@ public class UrlShortenerController {
     public static final List<String> GOOGLE_PLATFORM_TYPES = Arrays.asList("ANY_PLATFORM");
     public static final List<String> GOOGLE_THREAT_ENTRYTYPES = Arrays.asList("URL");
     public static NetHttpTransport httpTransport;
-    
+
     private static Pattern pDomainNameOnly;
-	private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
-    
-	static {
-		pDomainNameOnly = Pattern.compile(DOMAIN_NAME_PATTERN);
-	}
-	
+    private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
 
-	private static boolean isValidDomainName(String domainName) {
-		return pDomainNameOnly.matcher(domainName).find();
-	}
+    static {
+        pDomainNameOnly = Pattern.compile(DOMAIN_NAME_PATTERN);
+    }
 
-    
-    
+    private static boolean isValidDomainName(String domainName) {
+        return pDomainNameOnly.matcher(domainName).find();
+    }
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -136,30 +132,91 @@ public class UrlShortenerController {
         return findThreatMatchesRequest;
     }
 
+    String getPlatform(String browserDetails) {
+        // Code based on:
+        // https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser
+        String userAgent = browserDetails.toLowerCase();
+        if (userAgent.indexOf("windows") >= 0) {
+            return "Windows";
+        } else if (userAgent.indexOf("mac") >= 0) {
+            return "Mac";
+        } else if (userAgent.indexOf("x11") >= 0) {
+            if (userAgent.contains("bsd")) {
+                return "BSD";
+            }
+            return "Linux";
+        } else if (userAgent.indexOf("android") >= 0) {
+            return "Android";
+        } else if (userAgent.indexOf("iphone") >= 0) {
+            return "IPhone";
+        } else {
+            return "UnKnown, More-Info: " + userAgent;
+        }
+    }
+
+    String getBrowser(String browserDetails) {
+        // Code based on:
+        // https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser
+        String userAgent = browserDetails;
+        String user = userAgent.toLowerCase();
+        if (user.contains("msie")) {
+            return "Internet Explorer";
+        } else if (user.contains("edge")) {
+            return "Netscape";
+        } else if (user.contains("safari") && user.contains("version")) {
+            return "Safari";
+        } else if (user.contains("opr") || user.contains("opera")) {
+            return "Opera";
+        } else if (user.contains("chrome")) {
+            return "Chrome";
+        } else if ((user.indexOf("mozilla/7.0") > -1) || (user.indexOf("netscape6") != -1)
+                || (user.indexOf("mozilla/4.7") != -1) || (user.indexOf("mozilla/4.78") != -1)
+                || (user.indexOf("mozilla/4.08") != -1) || (user.indexOf("mozilla/3") != -1)) {
+            return "Netscape";
+
+        } else if (user.contains("firefox")) {
+            return "Firefox";
+        } else if (user.contains("rv")) {
+            return "Internet Explorer";
+        } else {
+            return "Unknown Browser";
+        }
+    }
+
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
     public ModelAndView redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
 
         IPInfo ipInfo;
+        String countryName = null;
+        String userAgent = request.getHeader("User-Agent");
+        String platform = getPlatform(userAgent);
+        String browser = getBrowser(userAgent);
+        System.out.println(browser);
+        System.out.println(userAgent);
         try {
-            // Working in local deployment          
-            // ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new File("src/main/resources/en_US.json")).build();
+            // Working in local deployment
+            // ipInfo =
+            // IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new
+            // File("src/main/resources/en_US.json")).build();
 
             // Working in Docker deployment
-            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token")).setCountryFile(new File("/en_US.json")).build();
+            ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
+                    .setCountryFile(new File("/en_US.json")).build();
 
             System.out.println("Redirection requested from " + request.getRemoteAddr());
             IPResponse response = ipInfo.lookupIP("1.1.1.1"); // Only works for external IPs
-            //IPResponse response = ipInfo.lookupIP(request.getRemoteAddr()); // Only works for external IPs
+            // IPResponse response = ipInfo.lookupIP(request.getRemoteAddr()); // Only works
+            // for external IPs
 
             // Print out the country code
             System.out.println("country code= " + response.getCountryCode());
             System.out.println("country name= " + response.getCountryName());
+            countryName = response.getCountryName();
         } catch (RateLimitedException ex) {
             System.out.println("RateLimitedException");
             // Handle rate limits here.
         }
-
 
         if (l != null) {
             String notSafe = null;
@@ -167,20 +224,19 @@ public class UrlShortenerController {
             try {
                 notSafe = CheckGSB(l.getTarget());
                 if (notSafe != "") {
-                    clickService.saveClick(id, extractIP(request));
+                    clickService.saveClick(id, extractIP(request), countryName, platform, browser);
                     HttpHeaders h = new HttpHeaders();
-                    
+
                     ModelAndView modelAndView = new ModelAndView("warning");
-                    
-                    
+
                     modelAndView.addObject("malware", notSafe);
                     modelAndView.addObject("link", l.getTarget());
-                    
+
                     return modelAndView;
-                    
+
                 } else {
-                    clickService.saveClick(id, extractIP(request));
-                    return new ModelAndView("redirect:"+l.getTarget());
+                    clickService.saveClick(id, extractIP(request), countryName, platform, browser);
+                    return new ModelAndView("redirect:" + l.getTarget());
                 }
             } catch (GeneralSecurityException e) {
                 e.printStackTrace();
@@ -193,10 +249,9 @@ public class UrlShortenerController {
                 model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 return model;
             }
-            
 
         } else {
-        	ModelAndView model = new ModelAndView("error");
+            ModelAndView model = new ModelAndView("error");
             model.setStatus(HttpStatus.NOT_FOUND);
             return model;
         }
@@ -205,66 +260,59 @@ public class UrlShortenerController {
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-                                              @RequestParam(value = "sponsor", required = false) String sponsor,
-                                              HttpServletRequest request) {
-        UrlValidator urlValidator = new UrlValidator(new String[]{"http",
-                "https", "ftp"});     
-        
-        if  (isValidDomainName(url)) {
-        	url = "http://" + url ;
+            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+        UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
+
+        if (isValidDomainName(url)) {
+            url = "http://" + url;
         }
-        
+
         if (urlValidator.isValid(url)) {
             HttpHeaders h = new HttpHeaders();
-            try{
+            try {
                 RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-                
+
                 RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
-                .setReadTimeout(Duration.ofMillis(700)).build();
+                        .setReadTimeout(Duration.ofMillis(700)).build();
                 HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
-        
 
                 ResponseEntity<String> response = getResponse(rest, url, requestEntity);
-                
-                
+
                 System.out.println("Status code: " + response.getStatusCode());
                 ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
                 h.setLocation(su.getUri());
                 System.out.println("Peticion correcta");
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-            } 
-            catch(SocketTimeoutException e){ // Timeout
+            } catch (SocketTimeoutException e) { // Timeout
                 System.out.println(e.getMessage());
                 System.out.println("Peticion incorrecta Timeout");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.OK);
-            }
-            catch(ResourceAccessException e){ // Unknown host
+            } catch (ResourceAccessException e) { // Unknown host
                 System.out.println(e.getMessage());
                 System.out.println("Peticion incorrecta ResourceAccessException");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.OK);
-            }
-            catch(HttpClientErrorException e){ // Client error
+            } catch (HttpClientErrorException e) { // Client error
                 System.out.println(e.getMessage());
-                if(e.getRawStatusCode() == 404){
+                if (e.getRawStatusCode() == 404) {
                     System.out.println("Peticion incorrecta HttpClientErrorException");
                     ShortURL su = new ShortURL(url, false);
                     return new ResponseEntity<>(su, h, HttpStatus.OK);
+                } else {
+                    ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
+                    h.setLocation(su.getUri());
+                    System.out.println("Peticion correcta");
+                    return new ResponseEntity<>(su, h, HttpStatus.CREATED);
                 }
-                else{
-                    ShortURL su = shortUrlService.save(url,  request.getRemoteAddr());
-                h.setLocation(su.getUri());
-                System.out.println("Peticion correcta");
-                return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-                }  
-            }                   
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    ResponseEntity<String> getResponse(RestTemplate rest, String url, HttpEntity<String> requestEntity) throws SocketTimeoutException{
+    ResponseEntity<String> getResponse(RestTemplate rest, String url, HttpEntity<String> requestEntity)
+            throws SocketTimeoutException {
         // Execute http get request as client
         return rest.exchange(url, HttpMethod.GET, requestEntity, String.class);
     }
@@ -272,17 +320,15 @@ public class UrlShortenerController {
     @RequestMapping(value = "/linkConfirm", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<ShortURL> shortenerConfirm(@RequestParam("url") String url,
-                                              @RequestParam(value = "sponsor", required = false) String sponsor,
-                                              HttpServletRequest request) {
+            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
         System.out.println("linkConfirm Request");
-        UrlValidator urlValidator = new UrlValidator(new String[]{"http",
-                "https", "ftp"});     
-        
-        if  (isValidDomainName(url)) {
-        	url = "http://" + url ;
+        UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
+
+        if (isValidDomainName(url)) {
+            url = "http://" + url;
         }
         if (urlValidator.isValid(url)) {
-            ShortURL su = shortUrlService.save(url,  request.getRemoteAddr());
+            ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();
             h.setLocation(su.getUri());
             return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -294,8 +340,7 @@ public class UrlShortenerController {
     private String extractIP(HttpServletRequest request) {
         return request.getRemoteAddr();
     }
-    
-    
+
     @GetMapping("/stadistics")
     public ModelAndView stadistics(HttpServletRequest request) {
         System.out.println("global stadistics");
@@ -312,7 +357,6 @@ public class UrlShortenerController {
         return modelAndView;
     }
 
-
     @GetMapping("/link-stats-access")
     public ModelAndView linkStatsAccess(HttpServletRequest request) {
         ModelAndView modelAndView;
@@ -320,10 +364,9 @@ public class UrlShortenerController {
         return modelAndView;
     }
 
-
     @PostMapping("/linkStats")
-    public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl,
-                                    @RequestParam("code") String code,  HttpServletRequest request) {
+    public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl, @RequestParam("code") String code,
+            HttpServletRequest request) {
         ModelAndView modelAndView;
         modelAndView = new ModelAndView("stadistics");
         // Add single Object example
@@ -336,8 +379,5 @@ public class UrlShortenerController {
         modelAndView.addObject("words", myWordsList);
         return modelAndView;
     }
-
-
-
 
 }
