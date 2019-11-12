@@ -43,10 +43,10 @@ $(document).ready(
                                 + "'>"
                                 + msg.uri
                                 + "</a></div>"
-                                + "<br>"
-                                + "<p>"
+                                + "<div class='alert alert-info' role='alert'>Here is the code to access your link stadistics"
+                                + "<br><strong> <font size='3'>"
                                 + msg.code
-                                + "</p>");
+                                + "</font></strong></div>");
                             
                             $("#qr-code").html(
                                 "<div class='text-center'>" +
@@ -83,10 +83,10 @@ $(document).ready(
                         + "'>"
                         + msg.uri
                         + "</a></div>"
-                        + "<br>"
-                        + "<p>"
+                        + "<div class='alert alert-info' role='alert'>Here is the code to access your link stadistics"
+                        + "<br><strong> <font size='3'>"
                         + msg.code
-                        + "</p>");
+                        + "</font></strong></div>");
                     
 
                     $("#qr-code").html(
