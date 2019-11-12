@@ -32,4 +32,7 @@ public class ShortURLService {
                 .build();
         return shortURLRepository.save(su);
     }
+    public Long count() {
+        return shortURLRepository.count();
+    }
 }

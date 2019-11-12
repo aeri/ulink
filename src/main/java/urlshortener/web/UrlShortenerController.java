@@ -301,14 +301,14 @@ public class UrlShortenerController {
         System.out.println("global stadistics");
         ModelAndView modelAndView;
         modelAndView = new ModelAndView("stadistics");
-        // Add single Object example
-        modelAndView.addObject("title", "ulink Global Stadistics from ftl");
-        // Add list example
-        List<String> myWordsList = new ArrayList<>();
-        myWordsList.add("hello");
-        myWordsList.add("world");
-        myWordsList.add("example");
-        modelAndView.addObject("words", myWordsList);
+
+        Long totalURL = shortUrlService.count();
+        modelAndView.addObject("totalURL", totalURL);
+
+        Long totalClicks = clickService.count();
+        modelAndView.addObject("totalClicks", totalClicks);
+
+
         return modelAndView;
     }
 
