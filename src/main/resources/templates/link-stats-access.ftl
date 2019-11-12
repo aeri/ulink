@@ -26,6 +26,9 @@
             <input type="password" class="form-control mx-sm-3" name="code" placeholder="code123">
           </div>
           <br>
+          <em><font size="3" color="red">${failedAccess}</font></em>
+          <br>
+          <br>
           <button type="submit" class="btn btn-lg btn-primary">See stadistics</button>
       </form>
   </div>

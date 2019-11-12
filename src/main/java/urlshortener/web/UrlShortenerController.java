@@ -367,6 +367,7 @@ public class UrlShortenerController {
     public ModelAndView linkStatsAccess(HttpServletRequest request) {
         ModelAndView modelAndView;
         modelAndView = new ModelAndView("link-stats-access");
+        modelAndView.addObject("failedAccess", "");
         return modelAndView;
     }
 
@@ -384,7 +385,8 @@ public class UrlShortenerController {
         
     	
     	if (l == null) {
-    		modelAndView = new ModelAndView("error");
+            modelAndView = new ModelAndView("link-stats-access");
+            modelAndView.addObject("failedAccess", "Incorrect shortened URL or code");
     		modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
          
     	}
