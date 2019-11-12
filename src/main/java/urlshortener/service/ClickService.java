@@ -3,9 +3,7 @@ package urlshortener.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import urlshortener.domain.Click;
-import urlshortener.domain.Country;
-import urlshortener.domain.ShortURL;
+import urlshortener.domain.*;
 import urlshortener.repository.ClickRepository;
 
 import java.sql.Date;
@@ -31,6 +29,12 @@ public class ClickService {
     }
     public List<Country> retrieveCountries(String hash) {
         return clickRepository.retrieveCountries(hash);
+    }
+    public List<Browser> retrieveBrowsers(String hash) {
+        return clickRepository.retrieveBrowsers(hash);
+    }
+    public List<Platform> retrievePlatforms(String hash) {
+        return clickRepository.retrievePlatforms(hash);
     }
 
     public Long count() {

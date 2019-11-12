@@ -70,6 +70,32 @@ public class ClickRepositoryImpl implements ClickRepository {
 			return null;
 		}
 	}
+
+    @Override
+    public List<Browser> retrieveBrowsers(String hash) {
+
+        System.out.println(hash);
+
+        try {
+            return jdbc.query("SELECT COUNT(id), browser FROM click WHERE hash=? GROUP BY browser ORDER BY COUNT(id) DESC",  new Object[]{hash}, boMapper);
+        } catch (Exception e) {
+            log.debug("When select for key {}", hash, e);
+            return null;
+        }
+    }
+
+    @Override
+    public List<Platform> retrievePlatforms(String hash) {
+
+        System.out.println(hash);
+
+        try {
+            return jdbc.query("SELECT COUNT(id), platform FROM click WHERE hash=? GROUP BY platform ORDER BY COUNT(id) DESC",  new Object[]{hash}, ptMapper);
+        } catch (Exception e) {
+            log.debug("When select for key {}", hash, e);
+            return null;
+        }
+    }
     
 
     @Override

@@ -15,7 +15,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
+import urlshortener.domain.Browser;
 import urlshortener.domain.Country;
+import urlshortener.domain.Platform;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ClickRepository;
 import urlshortener.service.ClickService;
@@ -373,10 +375,9 @@ public class UrlShortenerController {
                                     @RequestParam("code") String code,  HttpServletRequest request) {
 
     	
-    	String[] amper = shortenedUrl.split("/");
+    	String hashId = shortenedUrl.substring(shortenedUrl.lastIndexOf('/')+1) ;
 
-    	
-    	ShortURL l = shortUrlService.findByKeyCode(amper[1], code);
+    	ShortURL l = shortUrlService.findByKeyCode(hashId, code);
     	
     	ModelAndView modelAndView;
     	    
@@ -388,33 +389,31 @@ public class UrlShortenerController {
          
     	}
     	else {
-        	List<Country> alfa = clickService.retrieveCountries(amper[1]);
-        	
+    	    Gson gson = new Gson();
+    	    String rjs= "";
+            modelAndView = new ModelAndView("map");
 
-        	final Gson gson = new Gson();
-             	
-        	
-            for(Country model : alfa) {
-                System.out.println(model.getName());
-            }
-
-        	final String rjs = gson.toJson(alfa);
-        	
+    	    //Countries
+        	List<Country> countryList = clickService.retrieveCountries(hashId);
+            rjs = gson.toJson(countryList);
         	System.out.println(rjs);
+            modelAndView.addObject("mapdata", rjs);
 
-            
-    		
-    		modelAndView = new ModelAndView("map");
-    		modelAndView.addObject("mapdata", rjs);
+        	//Browsers
+            List<Browser> browsersList = clickService.retrieveBrowsers(hashId);
+            gson = new Gson();
+            rjs = gson.toJson(browsersList);
+            System.out.println(rjs);
+            modelAndView.addObject("browsersdata", rjs);
+
+            //Plaforms
+            List<Platform> platformsList = clickService.retrievePlatforms(hashId);
+            gson = new Gson();
+            rjs = gson.toJson(platformsList);
+            System.out.println(rjs);
+            modelAndView.addObject("platformdata", rjs);
+
     	}
-        // Add single Object example
-
-        // Add list example
-        List<String> myWordsList = new ArrayList<>();
-        myWordsList.add("shortened url & code");
-        myWordsList.add(shortenedUrl);
-        myWordsList.add(code);
-        modelAndView.addObject("words", myWordsList);
         return modelAndView;
     }
 
