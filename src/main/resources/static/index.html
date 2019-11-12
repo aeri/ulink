@@ -10,13 +10,18 @@
             type="text/javascript"></script>
     <script src="js/app.js" type="text/javascript">
     </script>
+
+    <link rel="stylesheet" media="screen" href="css/background.css">
+
 </head>
 <body>
-<div class="container-full">
+
+<div id="particles-js"></div>
+<div class="container-full" id="form">
     <div class="row">
         <div class="col-lg-12 text-center">
-            <h1>ulink</h1>
-            <p class="lead">A powerful url shortener</p>
+            <h1 style="color: white">ulink</h1>
+            <p class="lead" style="color: white">A powerful url shortener</p>
             <br>
             <form action="" class="col-lg-12" id="shortener" role="form">
                 <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
@@ -35,25 +40,30 @@
                 <br/>
                 <div id="result">
                 </div>
-             </div>
+            </div>
         </div>
-    <div id="qr-code"></div>
-    <br>
-    <div class="container-full">
-        <div class="row">
-            <div class="col-lg-12 text-center">
+        <div id="qr-code"></div>
+        <br>
+        <div class="container-full">
+            <div class="row">
+                <div class="col-lg-12 text-center">
                     <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
                         <span class="input-group-btn"><a href="./stadistics"
-                                class="btn btn-lg btn-info" type="button">Global stadistics</a></span>
+                                                         class="btn btn-lg btn-info" type="button">Global stadistics</a></span>
                     </div>
                     <br>
                     <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
                         <span class="input-group-btn"><a href="./link-stats-access"
-                                class="btn btn-lg btn-info" type="button">Link stadistics</a></span>
+                                                         class="btn btn-lg btn-info" type="button">Link stadistics</a></span>
                     </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+<script src="js/particles.js"></script>
+<script src="js/background.js"></script>
+
+
 </body>
 </html>

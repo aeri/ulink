@@ -96,6 +96,39 @@ public class ClickRepositoryImpl implements ClickRepository {
             return null;
         }
     }
+
+    @Override
+    public List<Country> retrieveCountriesGlobal() {
+
+        try {
+            return jdbc.query("SELECT COUNT(id), country, gc FROM click GROUP BY country,gc ORDER BY COUNT(id) DESC", coMapper);
+        } catch (Exception e) {
+            log.debug("When select for key {}", e);
+            return null;
+        }
+    }
+
+    @Override
+    public List<Browser> retrieveBrowsersGlobal() {
+
+        try {
+            return jdbc.query("SELECT COUNT(id), browser FROM click GROUP BY browser ORDER BY COUNT(id) DESC", boMapper);
+        } catch (Exception e) {
+            log.debug("When select for key {}", e);
+            return null;
+        }
+    }
+
+    @Override
+    public List<Platform> retrievePlatformsGlobal() {
+
+        try {
+            return jdbc.query("SELECT COUNT(id), platform FROM click GROUP BY platform ORDER BY COUNT(id) DESC", ptMapper);
+        } catch (Exception e) {
+            log.debug("When select for key {}", e);
+            return null;
+        }
+    }
     
 
     @Override

@@ -33,6 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
@@ -360,6 +363,41 @@ public class UrlShortenerController {
         modelAndView.addObject("totalClicks", totalClicks);
 
 
+        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+
+        for(Long threadID : threadMXBean.getAllThreadIds()) {
+            ThreadInfo info = threadMXBean.getThreadInfo(threadID);
+            System.out.println("Thread name: " + info.getThreadName());
+            System.out.println("Thread State: " + info.getThreadState());
+            System.out.println(String.format("CPU time: %s ns",
+                    threadMXBean.getThreadCpuTime(threadID)));
+        }
+
+
+        Gson gson = new Gson();
+        String rjs= "";
+
+        //Countries
+        List<Country> countryList = clickService.retrieveCountriesGlobal();
+        rjs = gson.toJson(countryList);
+        System.out.println(rjs);
+        modelAndView.addObject("mapdata", rjs);
+
+        //Browsers
+        List<Browser> browsersList = clickService.retrieveBrowsersGlobal();
+        gson = new Gson();
+        rjs = gson.toJson(browsersList);
+        System.out.println(rjs);
+        modelAndView.addObject("browsersdata", rjs);
+
+        //Plaforms
+        List<Platform> platformsList = clickService.retrievePlatformsGlobal();
+        gson = new Gson();
+        rjs = gson.toJson(platformsList);
+        System.out.println(rjs);
+        modelAndView.addObject("platformdata", rjs);
+
+
         return modelAndView;
     }
 
@@ -394,7 +432,7 @@ public class UrlShortenerController {
     	    Gson gson = new Gson();
     	    String rjs= "";
             modelAndView = new ModelAndView("map");
-            modelAndView.addObject("url", shortenedUrl);
+            modelAndView.addObject("url", hashId);
 
     	    //Countries
         	List<Country> countryList = clickService.retrieveCountries(hashId);

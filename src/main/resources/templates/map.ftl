@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>amCharts V4:  Map (simple, step 4)</title>
-  <#include "css/astyle.css">
   <#include "css/style_playforms.css">
 </head>
-<body>
+<body style=" color:White;">
 <!-- partial:index.partial.html -->
 <script src="https://www.amcharts.com/lib/4/core.js"></script>
 <script src="https://www.amcharts.com/lib/4/maps.js"></script>
 <script src="https://www.amcharts.com/lib/4/geodata/worldLow.js"></script>
 <script src="https://www.amcharts.com/lib/4/charts.js"></script>
 
+<div style="text-align:center;">
+  <p style="font-size:120px;">
+    Stadistics of ${url}
+  </p>
+</div>
+
+
 <div align="center">
-  <h1>Stadistics of ${url} </h1>
 <div class="row" style="margin-top: 50px;">
   <div class="column">
     <h3>Browsers</h3>
@@ -86,6 +91,10 @@ polygonTemplate.propertyFields.fill = "fill";
   pieSeries.dataFields.value = "counter";
   pieSeries.dataFields.category = "name";
 
+  pieSeries.labels.template.fill = "white";
+  pieSeries.ticks.template.stroke="white";
+  pieSeries.ticks.template.strokeWidth=1.5;
+
 </script>
 
 
@@ -101,6 +110,10 @@ polygonTemplate.propertyFields.fill = "fill";
   var pieSeries = chart.series.push(new am4charts.PieSeries());
   pieSeries.dataFields.value = "counter";
   pieSeries.dataFields.category = "name";
+
+  pieSeries.labels.template.fill = "white";
+  pieSeries.ticks.template.stroke="white";
+  pieSeries.ticks.template.strokeWidth=1.5;
 
 </script>
 

@@ -30,4 +30,10 @@ public interface ClickRepository {
     List<Browser> retrieveBrowsers(String hash);
 
     List<Platform> retrievePlatforms(String hash);
+
+    List<Country> retrieveCountriesGlobal();
+
+    List<Browser> retrieveBrowsersGlobal();
+
+    List<Platform> retrievePlatformsGlobal();
 }

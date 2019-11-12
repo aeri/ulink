@@ -36,6 +36,15 @@ public class ClickService {
     public List<Platform> retrievePlatforms(String hash) {
         return clickRepository.retrievePlatforms(hash);
     }
+    public List<Country> retrieveCountriesGlobal() {
+        return clickRepository.retrieveCountriesGlobal();
+    }
+    public List<Browser> retrieveBrowsersGlobal() {
+        return clickRepository.retrieveBrowsersGlobal();
+    }
+    public List<Platform> retrievePlatformsGlobal() {
+        return clickRepository.retrievePlatformsGlobal();
+    }
 
     public Long count() {
         return clickRepository.count();
