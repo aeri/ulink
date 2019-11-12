@@ -392,6 +392,7 @@ public class UrlShortenerController {
     	    Gson gson = new Gson();
     	    String rjs= "";
             modelAndView = new ModelAndView("map");
+            modelAndView.addObject("url", shortenedUrl);
 
     	    //Countries
         	List<Country> countryList = clickService.retrieveCountries(hashId);

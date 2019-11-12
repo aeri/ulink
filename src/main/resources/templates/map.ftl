@@ -14,7 +14,8 @@
 <script src="https://www.amcharts.com/lib/4/charts.js"></script>
 
 <div align="center">
-<div class="row">
+  <h1>Stadistics of ${url} </h1>
+<div class="row" style="margin-top: 50px;">
   <div class="column">
     <h3>Browsers</h3>
     <div id="chartdivBrowsers"></div>
@@ -25,7 +26,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" style="margin-top: 70px; margin-bottom: 150px;">
     <h3>Countries</h3>
     <div id="chartdivMap"></div>
 </div>
