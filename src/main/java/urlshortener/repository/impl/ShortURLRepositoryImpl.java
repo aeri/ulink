@@ -38,7 +38,17 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return null;
 		}
 	}
-
+	
+	@Override
+	public ShortURL findByKeyCode(String id, String code) {
+		try {
+			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=? AND code=?", rowMapper, id, code);
+		} catch (Exception e) {
+			log.debug("When select for key {}", id, e);
+			return null;
+		}
+	}
+	
 	@Override
 	public ShortURL save(ShortURL su) {
 

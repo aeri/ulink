@@ -22,4 +22,6 @@ public interface ShortURLRepository {
 
     List<ShortURL> list(Long limit, Long offset);
 
+	ShortURL findByKeyCode(String id, String code);
+
 }
