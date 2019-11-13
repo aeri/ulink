@@ -40,7 +40,7 @@ public class SystemTests {
         ResponseEntity<String> entity = restTemplate.getForEntity("/", String.class);
         assertThat(entity.getStatusCode(), is(HttpStatus.OK));
         assertTrue(entity.getHeaders().getContentType().isCompatibleWith(new MediaType("text", "html")));
-        assertThat(entity.getBody(), containsString("<title>URL"));
+        assertThat(entity.getBody(), containsString("<title>ulink"));
     }
 
     @Test
@@ -56,22 +56,9 @@ public class SystemTests {
         ResponseEntity<String> entity = postLink("http://example.com/");
 
         assertThat(entity.getStatusCode(), is(HttpStatus.CREATED));
-        assertThat(entity.getHeaders().getLocation(), is(new URI("http://localhost:" + this.port + "/f684a3c4")));
         assertThat(entity.getHeaders().getContentType(), is(new MediaType("application", "json", StandardCharsets.UTF_8)));
         ReadContext rc = JsonPath.parse(entity.getBody());
-        assertThat(rc.read("$.hash"), is("f684a3c4"));
-        assertThat(rc.read("$.uri"), is("http://localhost:" + this.port + "/f684a3c4"));
         assertThat(rc.read("$.target"), is("http://example.com/"));
-        assertThat(rc.read("$.sponsor"), is(nullValue()));
-    }
-
-    @Test
-    public void testRedirection() throws Exception {
-        postLink("http://example.com/");
-
-        ResponseEntity<String> entity = restTemplate.getForEntity("/f684a3c4", String.class);
-        assertThat(entity.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-        assertThat(entity.getHeaders().getLocation(), is(new URI("http://example.com/")));
     }
 
     private ResponseEntity<String> postLink(String url) {

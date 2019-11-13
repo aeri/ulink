@@ -37,13 +37,6 @@ public class ShortURLRepositoryTests {
     }
 
     @Test
-    public void thatSaveSponsor() {
-        assertNotNull(repository.save(urlSponsor()));
-        assertSame(jdbc.queryForObject("select sponsor from SHORTURL",
-                String.class), urlSponsor().getSponsor());
-    }
-
-    @Test
     public void thatSaveSafe() {
         assertNotNull(repository.save(urlSafe()));
         assertSame(

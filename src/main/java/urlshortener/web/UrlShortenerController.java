@@ -3,11 +3,11 @@ package urlshortener.web;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.Value;
 import com.google.api.services.safebrowsing.Safebrowsing;
 import com.google.api.services.safebrowsing.model.*;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -19,7 +19,8 @@ import urlshortener.domain.Browser;
 import urlshortener.domain.Country;
 import urlshortener.domain.Platform;
 import urlshortener.domain.ShortURL;
-import urlshortener.repository.ClickRepository;
+import urlshortener.repository.ShortURLRepository;
+import urlshortener.repository.impl.ShortURLRepositoryImpl;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 
@@ -32,12 +33,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.net.SocketTimeoutException;
-import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -50,7 +49,6 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
 
 @Controller
 public class UrlShortenerController {

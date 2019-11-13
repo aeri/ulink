@@ -3,3 +3,4 @@
 gradle assemble
 docker build -t ulink-spring .
 docker-compose up
+docker-compose down

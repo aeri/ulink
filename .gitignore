@@ -338,3 +338,4 @@ ASALocalRun/
 src/main/resources/application.properties
 src/test/resources/application.properties
 
+.gradle/buildOutputCleanup/cache.properties
