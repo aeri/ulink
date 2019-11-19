@@ -12,7 +12,7 @@ import urlshortener.repository.impl.ShortURLRepositoryImpl;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.HSQL;
+import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 import static urlshortener.fixtures.ShortURLFixture.*;
 
 public class ShortURLRepositoryTests {
@@ -21,13 +21,15 @@ public class ShortURLRepositoryTests {
     private ShortURLRepository repository;
     private JdbcTemplate jdbc;
 
+    
     @Before
     public void setup() {
-        db = new EmbeddedDatabaseBuilder().setType(HSQL)
-                .addScript("schema-hsqldb.sql").build();
+        db = new EmbeddedDatabaseBuilder().setType(H2)
+                .addScript("run.sql").setName("testdb;DATABASE_TO_UPPER=false;MODE=PostgreSQL").build();
         jdbc = new JdbcTemplate(db);
         repository = new ShortURLRepositoryImpl(jdbc);
     }
+    
 
     @Test
     public void thatSavePersistsTheShortURL() {
