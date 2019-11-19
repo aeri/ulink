@@ -1,0 +1,5 @@
+{{#TEST_COMBINATIONS}}
+    - script: NO_COLOURS=1 DEBUG=1 TEST_COMBINATIONS={{.}} ./tests/run.sh
+      env:
+        - COMBINATION={{.}}
+{{/TEST_COMBINATIONS}}

@@ -1,0 +1,101 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  namespace: mysystem
+  name: mysystem-db-node
+  labels:
+    name: database
+    system: mysystem
+    app: mysystem
+spec:
+  replicas: 3
+  serviceName: "mysystem-db"
+  template:
+    metadata:
+      labels:
+        name: database
+        system: mysystem
+    spec:
+      containers:
+        - name: db-node
+          image: postdock/postgres:latest-postgres11-repmgr40
+          livenessProbe:
+            exec:
+              command: ['bash', '-c', '/usr/local/bin/cluster/healthcheck/is_major_master.sh']
+            initialDelaySeconds: 600
+            timeoutSeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "10Mi"
+              cpu: "10m"
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            
+            - name: "REPMGR_WAIT_POSTGRES_START_TIMEOUT"
+              value: "600"
+            - name: "REPLICATION_PRIMARY_HOST"
+              value: "mysystem-db-node-0.mysystem-db"
+            - name: "PARTNER_NODES"
+              value: "mysystem-db-node-0.mysystem-db,mysystem-db-node-1.mysystem-db,mysystem-db-node-2.mysystem-db"
+            - name: "NODE_NAME"
+              value: "$(MY_POD_NAME)"
+            - name: "CLUSTER_NODE_NETWORK_NAME"
+              value: "$(MY_POD_NAME).mysystem-db"
+
+            - name: "CONFIGS"
+              value: "wal_keep_segments:250,shared_buffers:300MB,archive_command:'/bin/true'"
+
+            # Work DB
+            - name: "POSTGRES_DB"
+              valueFrom:
+                configMapKeyRef:
+                  name: mysystem-config
+                  key: app.db.database
+            - name: "POSTGRES_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: mysystem-secret
+                  key: app.db.user
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: mysystem-secret
+                  key: app.db.password
+
+            # Cluster configs
+            - name: "CLUSTER_NAME"
+              valueFrom:
+                configMapKeyRef:
+                  name: mysystem-config
+                  key: app.db.cluster.name
+            - name: "REPLICATION_DB"
+              valueFrom:
+                configMapKeyRef:
+                  name: mysystem-config
+                  key: app.db.cluster.replication.db
+            - name: "REPLICATION_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: mysystem-secret
+                  key: app.db.cluster.replication.user
+            - name: "REPLICATION_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: mysystem-secret
+                  key: app.db.cluster.replication.password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+        
