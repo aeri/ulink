@@ -12,31 +12,10 @@ $(document).ready(
                         if(!msg.confirmed){
                             $("#result").html("<div> </div>");
                             $("#qr-code").html("<div> </div>");
-                            $("#modal").html(
-                                "<div class='modal' id='confirmationModal' tabindex='-1' role='dialog'>"
-                                + "<div class='modal-dialog' role='document'>"
-                                + "<div class='modal-content'>"
-                                + "<div class='modal-header'>"
-                                + "<h3 class='modal-title'>Warning</h3>"
-                                + "</div>"
-                                + "<div class='modal-body'>"
-                                + "<p>Submitted URL may not be reachable. Do you still want to shorten it?</p>"
-                                + "</div>"
-                                + "<div class='modal-footer'>"
-                                + "<form action='' class='col-lg-12' id='shortenerConfirm' role='form'>"
-                                + "<button type='button' class='btn btn-secondary' data-dismiss='modal'>Cancel</button>"
-                                + "<button type='submit' class='btn btn-primary'>Confirm</button>"
-                                + "</form>"
-                                + "</div>"
-                                + "</div>"
-                                + "</div>"
-                                + "</div>");
-                            $("#confirmationModal").modal();
+                            $('#confirmationModal').appendTo("body").modal('show');
                         }
                         else{
-                            $('#confirmationModal').hide();
-                            $('body').removeClass('modal-open');
-                            $('.modal-backdrop').remove();
+                            $("[data-dismiss=modal]").trigger({ type: "click" });
                             $("#result").html(
                                 "<div class='alert alert-success lead'><a target='_blank' href='"
                                 + msg.uri
@@ -56,10 +35,7 @@ $(document).ready(
                             
                     },
                     error: function () {
-                        $('#confirmationModal').hide();
-                        $('body').removeClass('modal-open');
-                        $('.modal-backdrop').remove();
-                        $("#modal").html("<div> </div>");
+                        $("[data-dismiss=modal]").trigger({ type: "click" });
                         $("#result").html(
                             "<div class='alert alert-danger lead'>ERROR</div>");
                         $("#qr-code").html("<div> </div>");
@@ -73,18 +49,15 @@ $(document).ready(
                 url: "/linkConfirm",
                 data: localStorage.getItem("senturl"),
                 success: function (msg) {
-                    $('#confirmationModal').hide();
-                    $('body').removeClass('modal-open');
-                    $('.modal-backdrop').remove();
-                    $("#modal").html("<div> </div>");
+                    $("[data-dismiss=modal]").trigger({ type: "click" });
                     $("#result").html(
                         "<div class='alert alert-success lead'><a target='_blank' href='"
                         + msg.uri
                         + "'>"
                         + msg.uri
                         + "</a></div>"
-                        + "<div class='alert alert-info' role='alert'>Here is the code to access your link stadistics"
-                        + "<br><strong> <font size='3'>"
+                        + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link stadistics</font>"
+                        + "<br><strong><font size='5'>"
                         + msg.code
                         + "</font></strong></div>");
                     
@@ -97,10 +70,7 @@ $(document).ready(
 
                 },
                 error: function () {
-                    $('#confirmationModal').hide();
-                    $('body').removeClass('modal-open');
-                    $('.modal-backdrop').remove();
-                    $("#modal").html("<div> </div>");
+                    $("[data-dismiss=modal]").trigger({ type: "click" });
                     $("#result").html(
                         "<div class='alert alert-danger lead'>ERROR</div>");
                     $("#qr-code").html("<div> </div>");

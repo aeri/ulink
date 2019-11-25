@@ -33,7 +33,6 @@
             </form>
         </div>
     </div>
-    <div id="modal"></div>
     <div class="row">
         <div class="col-lg-12 text-center">
             <div class="col-sm-offset-4 col-sm-4 text-center">
@@ -64,6 +63,23 @@
 <script src="js/particles.js"></script>
 <script src="js/background.js"></script>
 
-
+<div class='modal' id='confirmationModal' tabindex='-1' role='dialog'>
+    <div class='modal-dialog' role='document'>
+    <div class='modal-content'>
+    <div class='modal-header'>
+    <h3 class='modal-title'>Warning</h3>
+    </div>
+    <div class='modal-body'>
+    <p><font size='3'>Submitted URL may not be reachable. Do you still want to shorten it?</font></p>
+    </div>
+    <div class='modal-footer'>
+    <form action='' class='col-lg-12' id='shortenerConfirm' role='form'>
+    <button type='button' class='btn btn-secondary' data-dismiss='modal'>Cancel</button>
+    <button type='submit' class='btn btn-primary'>Confirm</button>
+    </form>
+    </div>
+    </div>
+    </div>
+    </div>
 </body>
 </html>
