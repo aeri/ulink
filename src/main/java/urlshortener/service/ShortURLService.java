@@ -1,5 +1,7 @@
 package urlshortener.service;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
@@ -8,7 +10,10 @@ import urlshortener.web.UrlShortenerController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
+@CacheConfig(cacheNames= {"links"})
 public class ShortURLService {
 
     private final ShortURLRepository shortURLRepository;
@@ -17,6 +22,7 @@ public class ShortURLService {
         this.shortURLRepository = shortURLRepository;
     }
 
+    @Cacheable
     public ShortURL findByKey(String id) {
         return shortURLRepository.findByKey(id);
     }
@@ -36,7 +42,7 @@ public class ShortURLService {
                 .build();
         return shortURLRepository.save(su);
     }
-    public Long count() {
+    public CompletableFuture<Long> count() {
         return shortURLRepository.count();
     }
 }

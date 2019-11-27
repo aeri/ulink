@@ -3,6 +3,7 @@ package urlshortener.repository;
 import urlshortener.domain.ShortURL;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface ShortURLRepository {
 
@@ -18,7 +19,7 @@ public interface ShortURLRepository {
 
     void delete(String id);
 
-    Long count();
+    CompletableFuture<Long> count();
 
     List<ShortURL> list(Long limit, Long offset);
 
