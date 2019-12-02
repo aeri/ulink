@@ -10,7 +10,10 @@ import urlshortener.web.UrlShortenerController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @CacheConfig(cacheNames= {"links"})

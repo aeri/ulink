@@ -245,29 +245,13 @@ public class UrlShortenerController {
 				} else {
 					return new ModelAndView("redirect:" + l.getTarget());
 				}
-			} catch (GeneralSecurityException e) {
-				e.printStackTrace();
+			} catch (GeneralSecurityException | IOException | InterruptedException | ExecutionException e) {
+                e.printStackTrace();
 				ModelAndView model = new ModelAndView("error");
 				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 				return model;
-			} catch (IOException e) {
-				e.printStackTrace();
-				ModelAndView model = new ModelAndView("error");
-				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-				return model;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				ModelAndView model = new ModelAndView("error");
-				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-				return model;
-				// TODO Auto-generated catch block
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				ModelAndView model = new ModelAndView("error");
-				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-				return model;
-			}
+            }
+
 
 		} else {
 			ModelAndView model = new ModelAndView("error");
@@ -302,14 +286,9 @@ public class UrlShortenerController {
 				h.setLocation(su.getUri());
 				System.out.println("Peticion correcta");
 				return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-			} catch (SocketTimeoutException e) { // Timeout
+			} catch (SocketTimeoutException | ResourceAccessException e) { // Timeout OR Unknown host
 				System.out.println(e.getMessage());
 				System.out.println("Peticion incorrecta Timeout");
-				ShortURL su = new ShortURL(url, false);
-				return new ResponseEntity<>(su, h, HttpStatus.OK);
-			} catch (ResourceAccessException e) { // Unknown host
-				System.out.println(e.getMessage());
-				System.out.println("Peticion incorrecta ResourceAccessException");
 				ShortURL su = new ShortURL(url, false);
 				return new ResponseEntity<>(su, h, HttpStatus.OK);
 			} catch (HttpClientErrorException e) { // Client error
