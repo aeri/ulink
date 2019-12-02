@@ -22,8 +22,8 @@ $(document).ready(
                                 + "'>"
                                 + msg.uri
                                 + "</a></div>"
-                                + "<div class='alert alert-info' role='alert'>Here is the code to access your link stadistics"
-                                + "<br><strong> <font size='3'>"
+                                + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link stadistics</font>"
+                                + "<br><strong><font size='5'>"
                                 + msg.code
                                 + "</font></strong></div>");
                             
