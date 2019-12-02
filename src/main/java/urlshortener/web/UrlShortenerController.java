@@ -247,7 +247,7 @@ public class UrlShortenerController {
 				}
 			} catch (GeneralSecurityException | IOException | InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-				ModelAndView model = new ModelAndView("error");
+				ModelAndView model = new ModelAndView("error500");
 				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 				return model;
             }

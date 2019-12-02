@@ -8,7 +8,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-	<title>Error 404</title>
+	<title>Error 500</title>
 
 	<!-- Google font -->
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:700,900" rel="stylesheet">
@@ -30,8 +30,8 @@
 	<div id="notfound">
 		<div class="notfound">
 			<div class="notfound-404">
-				<h1>404</h1>
-				<h2>Page not found</h2>
+				<h1>500</h1>
+				<h2>Internal server error</h2>
 			</div>
 		</div>
 	</div>
