@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import urlshortener.domain.*;
 import urlshortener.repository.ClickRepository;
 
-import java.sql.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ClickService {
@@ -27,26 +27,26 @@ public class ClickService {
         cl = clickRepository.save(cl);
         log.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
     }
-    public List<Country> retrieveCountries(String hash) {
+    public CompletableFuture<List<Country>> retrieveCountries(String hash) {
         return clickRepository.retrieveCountries(hash);
     }
-    public List<Browser> retrieveBrowsers(String hash) {
+    public CompletableFuture<List<Browser>> retrieveBrowsers(String hash) {
         return clickRepository.retrieveBrowsers(hash);
     }
-    public List<Platform> retrievePlatforms(String hash) {
+    public CompletableFuture<List<Platform>> retrievePlatforms(String hash) {
         return clickRepository.retrievePlatforms(hash);
     }
-    public List<Country> retrieveCountriesGlobal() {
+    public CompletableFuture<List<Country>> retrieveCountriesGlobal() {
         return clickRepository.retrieveCountriesGlobal();
     }
-    public List<Browser> retrieveBrowsersGlobal() {
+    public CompletableFuture<List<Browser>> retrieveBrowsersGlobal() {
         return clickRepository.retrieveBrowsersGlobal();
     }
-    public List<Platform> retrievePlatformsGlobal() {
+    public CompletableFuture<List<Platform>> retrievePlatformsGlobal() {
         return clickRepository.retrievePlatformsGlobal();
     }
 
-    public Long count() {
+    public CompletableFuture<Long> count() {
         return clickRepository.count();
     }
 
