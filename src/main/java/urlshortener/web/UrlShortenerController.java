@@ -63,6 +63,9 @@ public class UrlShortenerController {
 	@Autowired
 	private Environment IPINFO_TOKEN;
 
+	@Autowired
+	private Environment EN_US_PATH;
+
 	public static final JacksonFactory GOOGLE_JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	public static final String GOOGLE_CLIENT_ID = "1"; // client id
 	public static final String GOOGLE_CLIENT_VERSION = "0.0.1"; // client version
@@ -298,13 +301,9 @@ public class UrlShortenerController {
 		if (l != null) {
 
 			try {
-				// Working in local deployment
-				ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
-						.setCountryFile(new File("src/main/resources/en_US.json")).build();
-
-				// Working in Docker deployment
-				// ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
-				// .setCountryFile(new File("/en_US.json")).build();
+				ipInfo =
+				IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
+						.setCountryFile(new File(EN_US_PATH.getProperty("path.en_us"))).build();
 
 				System.out.println("Redirection requested from " + request.getRemoteAddr());
 				IPResponse response = ipInfo.lookupIP("1.1.1.1"); // Only works for external IPs
