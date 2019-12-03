@@ -6,7 +6,6 @@ import urlshortener.domain.Country;
 import urlshortener.domain.Platform;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public interface ClickRepository {
 
@@ -22,19 +21,19 @@ public interface ClickRepository {
 
     void deleteAll();
 
-    CompletableFuture<Long> count();
+    Long count();
 
     List<Click> list(Long limit, Long offset);
 
-	CompletableFuture<List<Country>> retrieveCountries(String hash);
+	List<Country> retrieveCountries(String hash);
 
-    CompletableFuture<List<Browser>> retrieveBrowsers(String hash);
+    List<Browser> retrieveBrowsers(String hash);
 
-    CompletableFuture<List<Platform>> retrievePlatforms(String hash);
+    List<Platform> retrievePlatforms(String hash);
 
-    CompletableFuture<List<Country>> retrieveCountriesGlobal();
+    List<Country> retrieveCountriesGlobal();
 
-    CompletableFuture<List<Browser>> retrieveBrowsersGlobal();
+    List<Browser> retrieveBrowsersGlobal();
 
-    CompletableFuture<List<Platform>> retrievePlatformsGlobal();
+    List<Platform> retrievePlatformsGlobal();
 }

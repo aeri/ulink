@@ -7,14 +7,12 @@ import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Repository
 public class ShortURLRepositoryImpl implements ShortURLRepository {
@@ -40,7 +38,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return null;
 		}
 	}
-
+	
 	@Override
 	public ShortURL findByKeyCode(String id, String code) {
 		try {
@@ -50,7 +48,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return null;
 		}
 	}
-
+	
 	@Override
 	public ShortURL save(ShortURL su) {
 
@@ -84,8 +82,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public void update(ShortURL su) {
 		try {
-			jdbc.update("update shorturl set target=?, created=?, safe=?, ip=?, code=? where hash=?", su.getTarget(),
-					su.getCreated(), su.getSafe(), su.getIP(), su.getCode(), su.getHash());
+			jdbc.update(
+					"update shorturl set target=?, created=?, safe=?, ip=?, code=? where hash=?",
+					su.getTarget(), su.getCreated(), su.getSafe(),
+					su.getIP(), su.getCode(), su.getHash());
 		} catch (Exception e) {
 			log.debug("When update for hash {}", su.getHash(), e);
 		}
@@ -101,21 +101,19 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	}
 
 	@Override
-	@Async
-	public CompletableFuture<Long> count() {
+	public Long count() {
 		try {
-			return CompletableFuture.completedFuture(jdbc.queryForObject("select count(*) from shorturl", Long.class));
+			return jdbc.queryForObject("select count(*) from shorturl", Long.class);
 		} catch (Exception e) {
 			log.debug("When counting", e);
 		}
-		return CompletableFuture.completedFuture(-1L);
+		return -1L;
 	}
 
 	@Override
 	public List<ShortURL> list(Long limit, Long offset) {
 		try {
-			return 
-					jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?", new Object[] { limit, offset }, rowMapper);
+			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?", new Object[] { limit, offset }, rowMapper);
 		} catch (Exception e) {
 			log.debug("When select for limit {} and offset {}", limit, offset, e);
 			return Collections.emptyList();
