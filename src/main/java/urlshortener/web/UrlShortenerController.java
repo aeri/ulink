@@ -89,6 +89,98 @@ public class UrlShortenerController {
 		this.clickService = clickService;
 	}
 
+	
+	public ModelAndView getStats(String shortenedUrl, String code, boolean global) throws Throwable {
+
+		ModelAndView modelAndView;
+
+		
+		// Countries
+		CompletableFuture<List<Country>> countryList = new CompletableFuture<List<Country>>();
+		// Browsers
+		CompletableFuture<List<Browser>> browsersList = new CompletableFuture<List<Browser>>();
+		// Plaforms
+		CompletableFuture<List<Platform>> platformsList = new CompletableFuture<List<Platform>>();
+
+		if (global) {
+			
+			modelAndView = new ModelAndView("stadistics");
+			
+			CompletableFuture<Long> totalURL = shortUrlService.count();
+			CompletableFuture<Long> totalClicks = clickService.count();
+
+			// Countries
+			countryList = clickService.retrieveCountriesGlobal();
+			// Browsers
+			browsersList = clickService.retrieveBrowsersGlobal();
+			// Plaforms
+			platformsList = clickService.retrievePlatformsGlobal();
+
+			modelAndView.addObject("totalURL", totalURL.get());
+			modelAndView.addObject("totalClicks", totalClicks.get());
+
+		} else {
+			
+						
+			String hashId = shortenedUrl.substring(shortenedUrl.lastIndexOf('/') + 1);
+
+			ShortURL l = shortUrlService.findByKeyCode(hashId, code);
+
+			if (l == null) {
+				modelAndView = new ModelAndView("link-stats-access");
+				modelAndView.addObject("failedAccess", "Incorrect shortened URL or code");
+				modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+			else {
+				modelAndView = new ModelAndView("map");
+				modelAndView.addObject("url", hashId);
+				
+				// Countries
+				countryList = clickService.retrieveCountries(hashId);
+				// Browsers
+				browsersList = clickService.retrieveBrowsers(hashId);
+				// Plaforms
+				platformsList = clickService.retrievePlatforms(hashId);
+			}
+
+		}
+
+		ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+
+		for (Long threadID : threadMXBean.getAllThreadIds()) {
+			ThreadInfo info = threadMXBean.getThreadInfo(threadID);
+			System.out.println("Thread name: " + info.getThreadName());
+			System.out.println("Thread State: " + info.getThreadState());
+			System.out.println(String.format("CPU time: %s ns", threadMXBean.getThreadCpuTime(threadID)));
+		}
+
+		Gson gson = new Gson();
+		String rjsC = "";
+		String rjsB = "";
+		String rjsP = "";
+
+		try {
+			rjsC = gson.toJson(countryList.get());
+			System.out.println(rjsC);
+			modelAndView.addObject("mapdata", rjsC);
+
+			rjsB = gson.toJson(browsersList.get());
+			System.out.println(rjsB);
+			modelAndView.addObject("browsersdata", rjsB);
+
+			rjsP = gson.toJson(platformsList.get());
+			System.out.println(rjsP);
+			modelAndView.addObject("platformdata", rjsP);
+
+		} catch (Throwable e) {
+			throw e.getCause();
+		}
+
+		return modelAndView;
+
+	}
+
 	@Async
 	private CompletableFuture<String> CheckGSB(String url) throws GeneralSecurityException, IOException {
 
@@ -207,13 +299,12 @@ public class UrlShortenerController {
 
 			try {
 				// Working in local deployment
-				ipInfo =
-				IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
+				ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
 						.setCountryFile(new File("src/main/resources/en_US.json")).build();
 
 				// Working in Docker deployment
-				//ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
-				//		.setCountryFile(new File("/en_US.json")).build();
+				// ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
+				// .setCountryFile(new File("/en_US.json")).build();
 
 				System.out.println("Redirection requested from " + request.getRemoteAddr());
 				IPResponse response = ipInfo.lookupIP("1.1.1.1"); // Only works for external IPs
@@ -246,12 +337,11 @@ public class UrlShortenerController {
 					return new ModelAndView("redirect:" + l.getTarget());
 				}
 			} catch (GeneralSecurityException | IOException | InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+				e.printStackTrace();
 				ModelAndView model = new ModelAndView("error500");
 				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 				return model;
-            }
-
+			}
 
 		} else {
 			ModelAndView model = new ModelAndView("error");
@@ -341,56 +431,8 @@ public class UrlShortenerController {
 
 	@GetMapping("/stadistics")
 	public ModelAndView stadistics(HttpServletRequest request) throws Throwable {
-		System.out.println("global stadistics");
-		ModelAndView modelAndView;
-		modelAndView = new ModelAndView("stadistics");
 
-		CompletableFuture<Long> totalURL = shortUrlService.count();
-
-		CompletableFuture<Long> totalClicks = clickService.count();
-
-		ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-
-		for (Long threadID : threadMXBean.getAllThreadIds()) {
-			ThreadInfo info = threadMXBean.getThreadInfo(threadID);
-			System.out.println("Thread name: " + info.getThreadName());
-			System.out.println("Thread State: " + info.getThreadState());
-			System.out.println(String.format("CPU time: %s ns", threadMXBean.getThreadCpuTime(threadID)));
-		}
-
-		Gson gson = new Gson();
-		String rjsC = "";
-		String rjsB = "";
-		String rjsP = "";
-
-		// Countries
-		CompletableFuture<List<Country>> countryList = clickService.retrieveCountriesGlobal();
-		// Browsers
-		CompletableFuture<List<Browser>> browsersList = clickService.retrieveBrowsersGlobal();
-		// Plaforms
-		CompletableFuture<List<Platform>> platformsList = clickService.retrievePlatformsGlobal();
-
-		try {
-			rjsC = gson.toJson(countryList.get());
-			System.out.println(rjsC);
-			modelAndView.addObject("mapdata", rjsC);
-
-			rjsB = gson.toJson(browsersList.get());
-			System.out.println(rjsB);
-			modelAndView.addObject("browsersdata", rjsB);
-
-			rjsP = gson.toJson(platformsList.get());
-			System.out.println(rjsP);
-			modelAndView.addObject("platformdata", rjsP);
-
-			modelAndView.addObject("totalURL", totalURL.get());
-			modelAndView.addObject("totalClicks", totalClicks.get());
-
-		} catch (Throwable e) {
-			throw e.getCause();
-		}
-
-		return modelAndView;
+		return getStats("" , "", true);
 	}
 
 	@GetMapping("/link-stats-access")
@@ -405,52 +447,8 @@ public class UrlShortenerController {
 	public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl, @RequestParam("code") String code,
 			HttpServletRequest request) throws Throwable {
 
-		String hashId = shortenedUrl.substring(shortenedUrl.lastIndexOf('/') + 1);
+		return getStats(shortenedUrl, code, false);
 
-		ShortURL l = shortUrlService.findByKeyCode(hashId, code);
-
-		ModelAndView modelAndView;
-
-		if (l == null) {
-			modelAndView = new ModelAndView("link-stats-access");
-			modelAndView.addObject("failedAccess", "Incorrect shortened URL or code");
-			modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-
-		} else {
-			Gson gson = new Gson();
-			String rjsC = "";
-			String rjsB = "";
-			String rjsP = "";
-
-			modelAndView = new ModelAndView("map");
-			modelAndView.addObject("url", hashId);
-
-			// Countries
-			CompletableFuture<List<Country>> countryList = clickService.retrieveCountries(hashId);
-			// Browsers
-			CompletableFuture<List<Browser>> browsersList = clickService.retrieveBrowsers(hashId);
-			// Plaforms
-			CompletableFuture<List<Platform>> platformsList = clickService.retrievePlatforms(hashId);
-
-			try {
-				rjsC = gson.toJson(countryList.get());
-				System.out.println(rjsC);
-				modelAndView.addObject("mapdata", rjsC);
-
-				rjsB = gson.toJson(browsersList.get());
-				System.out.println(rjsB);
-				modelAndView.addObject("browsersdata", rjsB);
-
-				rjsP = gson.toJson(platformsList.get());
-				System.out.println(rjsP);
-				modelAndView.addObject("platformdata", rjsP);
-
-			} catch (Throwable e) {
-				throw e.getCause();
-			}
-
-		}
-		return modelAndView;
 	}
 
 }
