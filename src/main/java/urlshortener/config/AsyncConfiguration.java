@@ -1,4 +1,4 @@
-package urlshortener.repository.impl;
+package urlshortener.config;
 
 import java.util.concurrent.Executor;
 
@@ -13,6 +13,10 @@ public class AsyncConfiguration  {
     @Bean
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(4);
+        executor.setThreadNamePrefix("prefix");
+        executor.initialize();
         return executor;
     }
 }

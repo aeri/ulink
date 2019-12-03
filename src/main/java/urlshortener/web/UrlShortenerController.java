@@ -99,18 +99,18 @@ public class UrlShortenerController {
 
 		
 		// Countries
-		CompletableFuture<List<Country>> countryList = new CompletableFuture<List<Country>>();
+		List<Country> countryList = new ArrayList<>();
 		// Browsers
-		CompletableFuture<List<Browser>> browsersList = new CompletableFuture<List<Browser>>();
+		List<Browser> browsersList = new ArrayList<>();
 		// Plaforms
-		CompletableFuture<List<Platform>> platformsList = new CompletableFuture<List<Platform>>();
+		List<Platform> platformsList = new ArrayList<>();
 
 		if (global) {
 			
 			modelAndView = new ModelAndView("stadistics");
 			
-			CompletableFuture<Long> totalURL = shortUrlService.count();
-			CompletableFuture<Long> totalClicks = clickService.count();
+			Long totalURL = shortUrlService.count();
+			Long totalClicks = clickService.count();
 
 			// Countries
 			countryList = clickService.retrieveCountriesGlobal();
@@ -119,8 +119,8 @@ public class UrlShortenerController {
 			// Plaforms
 			platformsList = clickService.retrievePlatformsGlobal();
 
-			modelAndView.addObject("totalURL", totalURL.get());
-			modelAndView.addObject("totalClicks", totalClicks.get());
+			modelAndView.addObject("totalURL", totalURL);
+			modelAndView.addObject("totalClicks", totalClicks);
 
 		} else {
 			
@@ -163,22 +163,18 @@ public class UrlShortenerController {
 		String rjsB = "";
 		String rjsP = "";
 
-		try {
-			rjsC = gson.toJson(countryList.get());
-			System.out.println(rjsC);
-			modelAndView.addObject("mapdata", rjsC);
+		
+		rjsC = gson.toJson(countryList);
+		System.out.println(rjsC);
+		modelAndView.addObject("mapdata", rjsC);
 
-			rjsB = gson.toJson(browsersList.get());
-			System.out.println(rjsB);
-			modelAndView.addObject("browsersdata", rjsB);
+		rjsB = gson.toJson(browsersList);
+		System.out.println(rjsB);
+		modelAndView.addObject("browsersdata", rjsB);
 
-			rjsP = gson.toJson(platformsList.get());
-			System.out.println(rjsP);
-			modelAndView.addObject("platformdata", rjsP);
-
-		} catch (Throwable e) {
-			throw e.getCause();
-		}
+		rjsP = gson.toJson(platformsList);
+		System.out.println(rjsP);
+		modelAndView.addObject("platformdata", rjsP);
 
 		return modelAndView;
 
