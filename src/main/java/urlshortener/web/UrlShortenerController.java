@@ -1,13 +1,7 @@
 package urlshortener.web;
 
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.safebrowsing.Safebrowsing;
-import com.google.api.services.safebrowsing.model.*;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -16,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import urlshortener.domain.ShortURL;
-
+import urlshortener.service.CheckGSB;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 
@@ -41,8 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Base64;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,23 +51,10 @@ public class UrlShortenerController {
 	private final ClickService clickService;
 
 	@Autowired
-	private Environment GOOGLE_API_KEY;
-
-	@Autowired
 	private Environment IPINFO_TOKEN;
 
 	@Autowired
 	private Environment EN_US_PATH;
-
-	public static final JacksonFactory GOOGLE_JSON_FACTORY = JacksonFactory.getDefaultInstance();
-	public static final String GOOGLE_CLIENT_ID = "1"; // client id
-	public static final String GOOGLE_CLIENT_VERSION = "0.0.1"; // client version
-	public static final String GOOGLE_APPLICATION_NAME = "ulink"; // appication name
-	public static final List<String> GOOGLE_THREAT_TYPES = Arrays.asList("MALWARE", "SOCIAL_ENGINEERING",
-			"UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION");
-	public static final List<String> GOOGLE_PLATFORM_TYPES = Arrays.asList("ANY_PLATFORM");
-	public static final List<String> GOOGLE_THREAT_ENTRYTYPES = Arrays.asList("URL");
-	public static NetHttpTransport httpTransport;
 
 	private static Pattern pDomainNameOnly;
 	private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
@@ -91,58 +70,6 @@ public class UrlShortenerController {
 	public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
 		this.shortUrlService = shortUrlService;
 		this.clickService = clickService;
-	}
-
-	@Async
-	private CompletableFuture<String> CheckGSB(String url) throws GeneralSecurityException, IOException {
-
-		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-
-		List<String> urls = Arrays.asList(url);
-
-		FindThreatMatchesRequest findThreatMatchesRequest = createFindThreatMatchesRequest(urls);
-
-		Safebrowsing.Builder safebrowsingBuilder = new Safebrowsing.Builder(httpTransport, GOOGLE_JSON_FACTORY, null)
-				.setApplicationName(GOOGLE_APPLICATION_NAME);
-		Safebrowsing safebrowsing = safebrowsingBuilder.build();
-
-		FindThreatMatchesResponse findThreatMatchesResponse = safebrowsing.threatMatches()
-				.find(findThreatMatchesRequest).setKey(GOOGLE_API_KEY.getProperty("google.api_key")).execute();
-
-		List<ThreatMatch> threatMatches = findThreatMatchesResponse.getMatches();
-
-		if (threatMatches != null && threatMatches.size() > 0) {
-			return CompletableFuture.completedFuture(threatMatches.get(0).getThreatType());
-		} else {
-			return CompletableFuture.completedFuture("");
-		}
-
-	}
-
-	private FindThreatMatchesRequest createFindThreatMatchesRequest(List<String> urls) {
-		FindThreatMatchesRequest findThreatMatchesRequest = new FindThreatMatchesRequest();
-
-		ClientInfo clientInfo = new ClientInfo();
-		clientInfo.setClientId(GOOGLE_CLIENT_ID);
-		clientInfo.setClientVersion(GOOGLE_CLIENT_VERSION);
-		findThreatMatchesRequest.setClient(clientInfo);
-
-		ThreatInfo threatInfo = new ThreatInfo();
-		threatInfo.setThreatTypes(GOOGLE_THREAT_TYPES);
-		threatInfo.setPlatformTypes(GOOGLE_PLATFORM_TYPES);
-		threatInfo.setThreatEntryTypes(GOOGLE_THREAT_ENTRYTYPES);
-
-		List<ThreatEntry> threatEntries = new ArrayList<ThreatEntry>();
-
-		for (String url : urls) {
-			ThreatEntry threatEntry = new ThreatEntry();
-			threatEntry.set("url", url);
-			threatEntries.add(threatEntry);
-		}
-		threatInfo.setThreatEntries(threatEntries);
-		findThreatMatchesRequest.setThreatInfo(threatInfo);
-
-		return findThreatMatchesRequest;
 	}
 
 	String getPlatform(String browserDetails) {
@@ -226,28 +153,20 @@ public class UrlShortenerController {
 				// Handle rate limits here.
 			}
 
-			CompletableFuture<String> notSafe = null;
+			String notSafe = "";
 
-			try {
-				clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser);
-				notSafe = CheckGSB(l.getTarget());
-				if (notSafe.get() != "") {
-					clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser);
+			clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser);
 
-					ModelAndView modelAndView = new ModelAndView("warning");
+			if (!l.getSafe()) {
 
-					modelAndView.addObject("malware", notSafe.get());
-					modelAndView.addObject("link", l.getTarget());
+				ModelAndView modelAndView = new ModelAndView("warning");
 
-					return modelAndView;
-				} else {
-					return new ModelAndView("redirect:" + l.getTarget());
-				}
-			} catch (GeneralSecurityException | IOException | InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-				ModelAndView model = new ModelAndView("error500");
-				model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-				return model;
+				modelAndView.addObject("malware", notSafe);
+				modelAndView.addObject("link", l.getTarget());
+
+				return modelAndView;
+			} else {
+				return new ModelAndView("redirect:" + l.getTarget());
 			}
 
 		} else {
@@ -269,6 +188,16 @@ public class UrlShortenerController {
 
 		if (urlValidator.isValid(url)) {
 			HttpHeaders h = new HttpHeaders();
+			CheckGSB checkGSB = new CheckGSB();
+			String notSafe;
+			try {
+				System.out.println(url);
+				notSafe = checkGSB.check(url);
+			} catch (GeneralSecurityException | IOException e1) {
+				e1.printStackTrace();
+				ShortURL su = new ShortURL(url, false);
+				return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 			try {
 				RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
 
@@ -279,7 +208,7 @@ public class UrlShortenerController {
 				ResponseEntity<String> response = getResponse(rest, url, requestEntity);
 
 				System.out.println("Status code: " + response.getStatusCode());
-				ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
+				ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
 				h.setLocation(su.getUri());
 				System.out.println("Peticion correcta");
 				return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -287,15 +216,15 @@ public class UrlShortenerController {
 				System.out.println(e.getMessage());
 				System.out.println("Peticion incorrecta Timeout");
 				ShortURL su = new ShortURL(url, false);
-				return new ResponseEntity<>(su, h, HttpStatus.OK);
+				return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
 			} catch (HttpClientErrorException e) { // Client error
 				System.out.println(e.getMessage());
 				if (e.getRawStatusCode() == 404) {
 					System.out.println("Peticion incorrecta HttpClientErrorException");
 					ShortURL su = new ShortURL(url, false);
-					return new ResponseEntity<>(su, h, HttpStatus.OK);
+					return new ResponseEntity<>(su, h, HttpStatus.NOT_FOUND);
 				} else {
-					ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
+					ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
 					h.setLocation(su.getUri());
 					System.out.println("Peticion correcta");
 					return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -323,8 +252,19 @@ public class UrlShortenerController {
 			url = "http://" + url;
 		}
 		if (urlValidator.isValid(url)) {
-			ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
 			HttpHeaders h = new HttpHeaders();
+			CheckGSB checkGSB = new CheckGSB();
+			String notSafe;
+			try {
+				notSafe = checkGSB.check(url);
+			} catch (GeneralSecurityException | IOException e1) {
+				e1.printStackTrace();
+				ShortURL su = new ShortURL(url, false);
+				return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+			ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
+
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {

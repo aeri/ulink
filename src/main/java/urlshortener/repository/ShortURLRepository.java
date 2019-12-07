@@ -24,4 +24,6 @@ public interface ShortURLRepository {
 
 	ShortURL findByKeyCode(String id, String code);
 
+	List<ShortURL> retrieveUrls(int limit, int offset);
+
 }
