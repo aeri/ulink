@@ -21,25 +21,15 @@ $(document).ready(
                             + msg.code
                             + "</font></strong></div>");
                         
-                            
-                        //$("#qr-code").html(
-                        //    "<div class='text-center'>" +
-                        //       "<img src='https://chart.googleapis.com/chart?cht=qr&chl=" + msg.uri + "&chs=160x160&chld=L|0'" +
-                        //           "class='qr-code img-thumbnail img-responsive'> </div>");
-                        $.ajax({
-                            type: "GET",
-                            url: `/qr/?link=${msg.uri}`,
-                            success: function (uu) {
-
-                                //btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
-                                $('#ItemPreview').attr('src', `data:image/png;base64,${uu}`);
-                                
-                                $('#qr-code').html('<img src="data:image/png;base64,' + uu + "' class='qr-code img-thumbnail img-responsive'> />'");
-
-                            }
-                            
-    
-                        });
+                            $.ajax({
+                                type: "GET",
+                                url: `/qr/?link=${msg.uri}`,
+                                success: function (resQR) {
+                                    $('#qr-code').html(
+                                        "<div class='text-center'>" +
+                                        `<img src="data:image/png;base64,${resQR}" class='qr-code img-thumbnail img-responsive' /> </div>`);
+                                }
+                            });
                     },
                     error: function () {
                         $("[data-dismiss=modal]").trigger({ type: "click" });
@@ -68,23 +58,15 @@ $(document).ready(
                         + msg.code
                         + "</font></strong></div>");
                     
-                        
-                    //$("#qr-code").html(
-                    //    "<div class='text-center'>" +
-                    //       "<img src='https://chart.googleapis.com/chart?cht=qr&chl=" + msg.uri + "&chs=160x160&chld=L|0'" +
-                    //           "class='qr-code img-thumbnail img-responsive'> </div>");
-                    $.ajax({
-                        type: "GET",
-                        url: "/qr/" + msg.uri,
-                        success: function (uu) {
-                            $("#qr-code").html(
+                        $.ajax({
+                            type: "GET",
+                            url: `/qr/?link=${msg.uri}`,
+                            success: function (resQR) {
+                                $('#qr-code').html(
                                     "<div class='text-center'>" +
-                                       "<img src='" + uu + "'" +
-                                           "class='qr-code img-thumbnail img-responsive'> </div>");
-                        }
-                        
-
-                    });
+                                    `<img src="data:image/png;base64,${resQR}" class='qr-code img-thumbnail img-responsive' /> </div>`);
+                            }
+                        });
                 },
                 error: function () {
                     $("[data-dismiss=modal]").trigger({ type: "click" });
