@@ -49,8 +49,8 @@ public class ShortURLBuilder {
     }
 
 
-    ShortURLBuilder treatAsSafe() {
-        this.safe = true;
+    ShortURLBuilder treatAsSafe(String safe) {
+        this.safe = (safe == "");
         return this;
     }
 

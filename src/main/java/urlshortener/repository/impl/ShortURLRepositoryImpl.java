@@ -8,9 +8,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import urlshortener.domain.Browser;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +33,16 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	}
 
 	@Override
+	public List<ShortURL> retrieveUrls(int limit, int offset) {
+
+		try {
+			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?", new Object[] { limit, offset }, rowMapper);
+		} catch (Exception e) {
+			return new ArrayList<ShortURL>();
+		}
+	}
+
+	@Override
 	public ShortURL findByKey(String id) {
 		try {
 			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?", rowMapper, id);
@@ -38,7 +51,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public ShortURL findByKeyCode(String id, String code) {
 		try {
@@ -48,7 +61,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public ShortURL save(ShortURL su) {
 
@@ -82,10 +95,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public void update(ShortURL su) {
 		try {
-			jdbc.update(
-					"update shorturl set target=?, created=?, safe=?, ip=?, code=? where hash=?",
-					su.getTarget(), su.getCreated(), su.getSafe(),
-					su.getIP(), su.getCode(), su.getHash());
+			jdbc.update("update shorturl set target=?, created=?, safe=?, ip=?, code=? where hash=?", su.getTarget(),
+					su.getCreated(), su.getSafe(), su.getIP(), su.getCode(), su.getHash());
 		} catch (Exception e) {
 			log.debug("When update for hash {}", su.getHash(), e);
 		}

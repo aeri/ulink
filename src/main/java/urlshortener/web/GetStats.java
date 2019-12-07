@@ -87,6 +87,8 @@ public class GetStats {
 		modelAndView = new ModelAndView("stadistics");
 
 		modelAndView.addAllObjects(hmap);
+		
+		System.out.println("DISPATCH");
 
 		return modelAndView;
 
@@ -155,15 +157,21 @@ public class GetStats {
 			modelAndView.addAllObjects(hmap);
 
 		}
+		
+		/*
 
 		ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
+	
 		for (Long threadID : threadMXBean.getAllThreadIds()) {
 			ThreadInfo info = threadMXBean.getThreadInfo(threadID);
 			System.out.println("Thread name: " + info.getThreadName());
 			System.out.println("Thread State: " + info.getThreadState());
 			System.out.println(String.format("CPU time: %s ns", threadMXBean.getThreadCpuTime(threadID)));
 		}
+		*/
+		
+		System.out.println("DISPATCH");
 
 		return modelAndView;
 
