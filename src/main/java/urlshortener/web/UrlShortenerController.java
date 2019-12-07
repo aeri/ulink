@@ -25,10 +25,13 @@ import io.ipinfo.api.IPInfo;
 import io.ipinfo.api.errors.RateLimitedException;
 import io.ipinfo.api.model.IPResponse;
 
+import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import java.util.List;
+import java.util.Base64;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -44,6 +48,9 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.util.StreamUtils;
 
 @Controller
 public class UrlShortenerController {
@@ -351,6 +358,24 @@ public class UrlShortenerController {
 		GetStats getStats = new GetStats();
 		return getStats.getLocal(clickService, shortUrlService, shortenedUrl, code);
 
+	}
+
+
+	@ResponseBody
+	@RequestMapping(value = "/qr",  method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+	public ResponseEntity<String> qr(@RequestParam("link") String link){
+		HttpHeaders h = new HttpHeaders();
+		RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+
+		RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
+				.setReadTimeout(Duration.ofMillis(2000)).build();
+		HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
+		String url = "https://chart.googleapis.com/chart?cht=qr&chl=" + link + "&chs=160x160&chld=L|0";
+		ResponseEntity<byte[]> response =  rest.exchange(url, HttpMethod.GET, requestEntity, byte[].class);
+		String base64 = Base64.getEncoder().encodeToString(response.getBody());
+		return new ResponseEntity<String>(base64, HttpStatus.OK);
+		//return response;	
+		
 	}
 
 }
