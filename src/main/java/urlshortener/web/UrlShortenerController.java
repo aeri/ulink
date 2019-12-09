@@ -10,9 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import urlshortener.domain.ShortURL;
-import urlshortener.service.CheckGSB;
-import urlshortener.service.ClickService;
-import urlshortener.service.ShortURLService;
+import urlshortener.service.*;
 
 import io.ipinfo.api.IPInfo;
 
@@ -40,15 +38,14 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.data.util.StreamUtils;
 
 @Controller
 public class UrlShortenerController {
 	private final ShortURLService shortUrlService;
 
 	private final ClickService clickService;
+	private final PlatformService platformService = new PlatformService();
+	private final BrowserService browserService = new BrowserService();
 
 	@Autowired
 	private Environment IPINFO_TOKEN;
@@ -72,57 +69,6 @@ public class UrlShortenerController {
 		this.clickService = clickService;
 	}
 
-	String getPlatform(String browserDetails) {
-		// Code based on:
-		// https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser
-		String userAgent = browserDetails.toLowerCase();
-		if (userAgent.indexOf("windows") >= 0) {
-			return "Windows";
-		} else if (userAgent.indexOf("mac") >= 0) {
-			return "Mac";
-		} else if (userAgent.indexOf("x11") >= 0) {
-			if (userAgent.contains("bsd")) {
-				return "BSD";
-			}
-			return "Linux";
-		} else if (userAgent.indexOf("android") >= 0) {
-			return "Android";
-		} else if (userAgent.indexOf("iphone") >= 0) {
-			return "IPhone";
-		} else {
-			return "UnKnown, More-Info: " + userAgent;
-		}
-	}
-
-	String getBrowser(String browserDetails) {
-		// Code based on:
-		// https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser
-		String userAgent = browserDetails;
-		String user = userAgent.toLowerCase();
-		if (user.contains("msie")) {
-			return "Internet Explorer";
-		} else if (user.contains("edge")) {
-			return "Netscape";
-		} else if (user.contains("safari") && user.contains("version")) {
-			return "Safari";
-		} else if (user.contains("opr") || user.contains("opera")) {
-			return "Opera";
-		} else if (user.contains("chrome")) {
-			return "Chrome";
-		} else if ((user.indexOf("mozilla/7.0") > -1) || (user.indexOf("netscape6") != -1)
-				|| (user.indexOf("mozilla/4.7") != -1) || (user.indexOf("mozilla/4.78") != -1)
-				|| (user.indexOf("mozilla/4.08") != -1) || (user.indexOf("mozilla/3") != -1)) {
-			return "Netscape";
-
-		} else if (user.contains("firefox")) {
-			return "Firefox";
-		} else if (user.contains("rv")) {
-			return "Internet Explorer";
-		} else {
-			return "Unknown Browser";
-		}
-	}
-
 	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
 	public ModelAndView redirectTo(@PathVariable String id, HttpServletRequest request) {
 		ShortURL l = shortUrlService.findByKey(id);
@@ -131,8 +77,8 @@ public class UrlShortenerController {
 		String countryName = null;
 		String countryCode = null;
 		String userAgent = request.getHeader("User-Agent");
-		String platform = getPlatform(userAgent);
-		String browser = getBrowser(userAgent);
+		String platform = platformService.getPlatform(userAgent);
+		String browser = browserService.getBrowser(userAgent);
 
 		if (l != null) {
 
@@ -299,7 +245,6 @@ public class UrlShortenerController {
 		return getStats.getLocal(clickService, shortUrlService, shortenedUrl, code);
 
 	}
-
 
 	@ResponseBody
 	@RequestMapping(value = "/qr",  method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)

@@ -1,5 +1,7 @@
 package urlshortener.service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
@@ -32,6 +34,7 @@ public class ShortURLService {
 		return shortURLRepository.findByKeyCode(id, code);
 	}
 
+	@CacheEvict(key = "#su.hash")
 	public ShortURL mark(ShortURL su, boolean safeness) {
 		return shortURLRepository.mark(su, safeness);
 	}
