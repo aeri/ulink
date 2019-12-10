@@ -61,6 +61,7 @@ public class UrlShortenerController {
 
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
     public ModelAndView redirectTo(@PathVariable String id, HttpServletRequest request) {
+        log.info(id);
         ShortURL l = shortUrlService.findByKey(id);
 
         IPInfo ipInfo;
@@ -77,9 +78,8 @@ public class UrlShortenerController {
                         .setCountryFile(new File(EN_US_PATH.getProperty("path.en_us"))).build();
 
                 log.debug("Redirection requested from " + request.getRemoteAddr());
-                IPResponse response = ipInfo.lookupIP("1.1.1.1"); // Only works for external IPs
-                // IPResponse response = ipInfo.lookupIP(request.getRemoteAddr()); // Only works
-                // for external IPs
+
+                 IPResponse response = ipInfo.lookupIP(request.getRemoteAddr());
 
                 // Print out the country code
                 countryName = response.getCountryName();

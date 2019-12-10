@@ -34,7 +34,7 @@ public class ShortURLService {
 		return shortURLRepository.findByKeyCode(id, code);
 	}
 
-	@CacheEvict(key = "#su.hash")
+	@CachePut(key = "#su.hash")
 	public ShortURL mark(ShortURL su, boolean safeness) {
 		return shortURLRepository.mark(su, safeness);
 	}
