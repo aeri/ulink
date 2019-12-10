@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+
 @Component
 public class GoogleSafe {
 
@@ -43,15 +45,20 @@ public class GoogleSafe {
 					shortUrlService.mark(s, !safe);
 				}
 				
-			} catch (GeneralSecurityException | IOException e) {
+			}
+			catch(GoogleJsonResponseException e){
+				log.debug("Google Safe Browsing quota exceeded");
+			}
+			catch (GeneralSecurityException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 		}
 
 	}
 
-	@Scheduled(cron = "*/20 * * * * *")
+	@Scheduled(cron = "* */30 * * * *")
 	public void check() {
 		int offset = 0;
 		List<ShortURL> listURL = shortUrlService.retrieveUrls(LIMIT, offset);

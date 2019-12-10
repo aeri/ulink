@@ -16,6 +16,9 @@ import io.ipinfo.api.IPInfo;
 import io.ipinfo.api.errors.RateLimitedException;
 import io.ipinfo.api.model.IPResponse;
 import javax.servlet.http.HttpServletRequest;
+
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -124,9 +127,14 @@ public class UrlShortenerController {
             CheckGSB checkGSB = new CheckGSB();
             String notSafe;
             try {
-                log.debug(url);
-                notSafe = checkGSB.check(url);
-            } catch (GeneralSecurityException | IOException e1) {
+				log.debug(url);
+				notSafe = checkGSB.check(url);
+			}
+			catch(GoogleJsonResponseException e){
+				log.debug("Google Safe Browsing quota exceeded");
+				notSafe = "";
+			}
+			catch (GeneralSecurityException | IOException e1) {
                 e1.printStackTrace();
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
