@@ -152,8 +152,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 				ps.setString(6, cl.getCountryCode());
 				return ps;
 			}, holder);
-			if (holder.getKey() != null) {
-				new DirectFieldAccessor(cl).setPropertyValue("id", holder.getKey().longValue());
+			if ((Long)holder.getKeys().get("id") != null) {
+				new DirectFieldAccessor(cl).setPropertyValue("id", (Long)holder.getKeys().get("id"));
 			} else {
 				log.debug("Key from database is null");
 			}

@@ -22,9 +22,6 @@ public class SecureHash {
 	            int rndCharAt = random.nextInt(DATA_FOR_RANDOM_STRING.length());
 	            char rndChar = DATA_FOR_RANDOM_STRING.charAt(rndCharAt);
 
-	            // debug
-	            System.out.format("%d\t:\t%c%n", rndCharAt, rndChar);
-
 	            sb.append(rndChar);
 
 	        }

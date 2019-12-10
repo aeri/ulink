@@ -10,6 +10,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -20,6 +22,8 @@ import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 
 public class GetStats {
+
+	private static final Logger log = LoggerFactory.getLogger(GetStats.class);
 
 	public ModelAndView getGlobal(ClickService clickService, ShortURLService shortUrlService) throws Throwable {
 
@@ -32,7 +36,7 @@ public class GetStats {
 			String rjsC = "";
 
 			rjsC = gson.toJson(clickService.retrieveCountriesGlobal());
-			System.out.println(rjsC);
+			log.debug(rjsC);
 
 			hmap.put("mapdata", rjsC);
 
@@ -45,7 +49,7 @@ public class GetStats {
 			String rjsC = "";
 
 			rjsC = gson.toJson(clickService.retrieveBrowsersGlobal());
-			System.out.println(rjsC);
+			log.debug(rjsC);
 
 			hmap.put("browsersdata", rjsC);
 
@@ -57,7 +61,7 @@ public class GetStats {
 			String rjsC = "";
 
 			rjsC = gson.toJson(clickService.retrievePlatformsGlobal());
-			System.out.println(rjsC);
+			log.debug(rjsC);
 
 			hmap.put("platformdata", rjsC);
 
@@ -88,7 +92,7 @@ public class GetStats {
 
 		modelAndView.addAllObjects(hmap);
 		
-		System.out.println("DISPATCH");
+		log.debug("DISPATCH");
 
 		return modelAndView;
 
@@ -116,7 +120,7 @@ public class GetStats {
 				String rjsC = "";
 
 				rjsC = gson.toJson(clickService.retrieveCountries(hashId));
-				System.out.println(rjsC);
+				log.debug(rjsC);
 
 				hmap.put("mapdata", rjsC);
 
@@ -129,7 +133,7 @@ public class GetStats {
 				String rjsC = "";
 
 				rjsC = gson.toJson(clickService.retrieveBrowsers(hashId));
-				System.out.println(rjsC);
+				log.debug(rjsC);
 
 				hmap.put("browsersdata", rjsC);
 
@@ -141,7 +145,7 @@ public class GetStats {
 				String rjsC = "";
 
 				rjsC = gson.toJson(clickService.retrievePlatforms(hashId));
-				System.out.println(rjsC);
+				log.debug(rjsC);
 
 				hmap.put("platformdata", rjsC);
 
@@ -165,13 +169,13 @@ public class GetStats {
 	
 		for (Long threadID : threadMXBean.getAllThreadIds()) {
 			ThreadInfo info = threadMXBean.getThreadInfo(threadID);
-			System.out.println("Thread name: " + info.getThreadName());
-			System.out.println("Thread State: " + info.getThreadState());
-			System.out.println(String.format("CPU time: %s ns", threadMXBean.getThreadCpuTime(threadID)));
+			log.debug("Thread name: " + info.getThreadName());
+			log.debug("Thread State: " + info.getThreadState());
+			log.debug(String.format("CPU time: %s ns", threadMXBean.getThreadCpuTime(threadID)));
 		}
 		*/
 		
-		System.out.println("DISPATCH");
+		log.debug("DISPATCH");
 
 		return modelAndView;
 
