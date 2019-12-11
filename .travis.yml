@@ -6,7 +6,7 @@ services:
   - docker
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_f7ae704df2f8_key -iv $encrypted_f7ae704df2f8_iv -in src/main/resources/application.properties.enc -out src/main/resources/application.properties -d
+  - openssl aes-256-cbc -K $encrypted_f7ae704df2f8_key -iv $encrypted_f7ae704df2f8_iv -in src/main/resources/application-heku.properties.enc -out src/main/resources/application-heku.properties -d
   # install heroku CLI
   - wget -qO- https://toolbelt.heroku.com/install.sh | sh
   # login to docker registries (dockerhub + heroku)
