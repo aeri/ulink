@@ -20,8 +20,8 @@ public class GoogleSafe {
 
 	private static final int LIMIT = 100;
 
-	private static ShortURLService shortUrlService;
-	private static CheckGSB gsb;
+	private ShortURLService shortUrlService;
+	private CheckGSB gsb;
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -40,7 +40,7 @@ public class GoogleSafe {
 				String result = gsb.check(s.getTarget());
 				log.debug(s.getTarget());
 				
-				if (safe && result != "" || !safe && result=="") {
+				if (safe && !result.equals("") || !safe && result.equals("")) {
 					log.debug("Changed: "+ s.getTarget());
 					shortUrlService.mark(s, !safe);
 				}
