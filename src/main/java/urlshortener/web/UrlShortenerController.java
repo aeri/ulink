@@ -163,13 +163,18 @@ public class UrlShortenerController {
                 if (e.getRawStatusCode() == 404) {
                     log.debug("Peticion incorrecta HttpClientErrorException");
                     ShortURL su = new ShortURL(url, false);
-                    return new ResponseEntity<>(su, h, HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
                 } else {
                     ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
                     h.setLocation(su.getUri());
                     log.debug("Peticion correcta");
                     return new ResponseEntity<>(su, h, HttpStatus.CREATED);
                 }
+            } catch(NullPointerException e){
+                log.debug(e.getMessage());
+                log.debug("Fallo al guardar url en la base");
+                ShortURL su = new ShortURL(url, false);
+                return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
