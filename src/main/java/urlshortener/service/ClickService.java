@@ -8,6 +8,7 @@ import urlshortener.domain.*;
 import urlshortener.repository.ClickRepository;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -50,6 +51,10 @@ public class ClickService {
 
     public Long count() {
         return clickRepository.count();
+    }
+
+    public Long retrieveAverageLatency(Timestamp since){
+        return clickRepository.retrieveAverageLatency(since);
     }
 
 }

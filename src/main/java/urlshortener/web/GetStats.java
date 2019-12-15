@@ -3,6 +3,7 @@ package urlshortener.web;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +26,7 @@ public class GetStats {
 
 	private static final Logger log = LoggerFactory.getLogger(GetStats.class);
 
-	public ModelAndView getGlobal(ClickService clickService, ShortURLService shortUrlService) throws Throwable {
+	public ModelAndView getGlobal(ClickService clickService, ShortURLService shortUrlService, Timestamp since) throws Throwable {
 
 		ModelAndView modelAndView;
 
@@ -84,11 +85,24 @@ public class GetStats {
 			return hmap;
 		});
 
-		Map<String, String> hmap = Stream.of(countryList, browsersList, platformsList, totalURL, totalClicks)
+		CompletableFuture<HashMap<String, String>> averageLatency = CompletableFuture.supplyAsync(() -> {
+			HashMap<String, String> hmap = new HashMap<String, String>();
+			try{
+				hmap.put("averageTime", clickService.retrieveAverageLatency(since).toString());
+			}
+			catch(NullPointerException e){
+				// No results retreived
+				hmap.put("averageTime", "-1");
+			}
+
+			return hmap;
+		});
+
+		Map<String, String> hmap = Stream.of(countryList, browsersList, platformsList, totalURL, totalClicks, averageLatency)
 				.map(CompletableFuture::join).flatMap(m -> m.entrySet().stream())
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
-		modelAndView = new ModelAndView("stadistics");
+		modelAndView = new ModelAndView("statistics");
 
 		modelAndView.addAllObjects(hmap);
 		

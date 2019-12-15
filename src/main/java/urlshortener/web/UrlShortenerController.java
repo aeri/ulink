@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.security.GeneralSecurityException;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -43,6 +45,9 @@ public class UrlShortenerController {
 
     @Autowired
     private Environment EN_US_PATH;
+
+    @Autowired
+    private Environment LATENCY_PERIOD;
 
     private static Pattern pDomainNameOnly;
     private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
@@ -223,10 +228,12 @@ public class UrlShortenerController {
         return request.getRemoteAddr();
     }
 
-    @GetMapping("/stadistics")
-    public ModelAndView stadistics(HttpServletRequest request) throws Throwable {
+    @GetMapping("/statistics")
+    public ModelAndView statistics(HttpServletRequest request) throws Throwable {
         GetStats getStats = new GetStats();
-        return getStats.getGlobal(clickService, shortUrlService);
+        String minutes = LATENCY_PERIOD.getProperty("metric.latency.period");
+        Timestamp since = new Timestamp(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Long.parseLong(minutes)));
+        return getStats.getGlobal(clickService, shortUrlService, since);
     }
 
     @GetMapping("/link-stats-access")

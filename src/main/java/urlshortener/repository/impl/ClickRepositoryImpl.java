@@ -18,6 +18,7 @@ import urlshortener.repository.ClickRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 
@@ -227,6 +228,16 @@ public class ClickRepositoryImpl implements ClickRepository {
 			return jdbc.queryForObject("select count(*) from click where hash = ?", new Object[] { hash }, Long.class);
 		} catch (Exception e) {
 			log.debug("When counting hash " + hash, e);
+		}
+		return -1L;
+	}
+
+	@Override
+	public Long retrieveAverageLatency(Timestamp since){
+		try {
+			return jdbc.queryForObject("SELECT AVG (LATENCY) FROM CLICK WHERE CREATED > ?", new Object[] { since }, Long.class);
+		} catch (Exception e) {
+			log.debug("When retrieving average latency since " + since, e);
 		}
 		return -1L;
 	}
