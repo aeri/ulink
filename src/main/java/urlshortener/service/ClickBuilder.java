@@ -13,6 +13,7 @@ public class ClickBuilder {
     private String ip;
     private String country;
     private String countryCode;
+    private long latency;
 
     static ClickBuilder newInstance() {
         return new ClickBuilder();
@@ -20,7 +21,7 @@ public class ClickBuilder {
 
     Click build() {
         return new Click(null, hash, created,
-                browser, platform, ip, country, countryCode);
+                browser, platform, ip, country, countryCode, latency);
     }
 
     ClickBuilder hash(String hash) {
@@ -76,6 +77,11 @@ public class ClickBuilder {
 
     ClickBuilder countryCode(String countryCode) {
         this.countryCode = countryCode;
+        return this;
+    }
+
+    ClickBuilder latency(long latency) {
+        this.latency = latency;
         return this;
     }
 

@@ -28,7 +28,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	private static final RowMapper<Click> rowMapper = (rs, rowNum) -> new Click(rs.getLong("id"), rs.getString("hash"),
 			rs.getDate("created"), rs.getString("browser"), rs.getString("platform"), rs.getString("ip"),
-			rs.getString("country"), rs.getString("countryCode"));
+			rs.getString("country"), rs.getString("countryCode"), rs.getLong("latency"));
 
 	private static final RowMapper<Country> coMapper = (rs, rowNum) -> new Country(rs.getString("gc"),
 			rs.getString("country"), rs.getInt("count"));
@@ -142,7 +142,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 			KeyHolder holder = new GeneratedKeyHolder();
 			jdbc.update(conn -> {
 				PreparedStatement ps = conn.prepareStatement(
-						"INSERT INTO CLICK VALUES (DEFAULT, ?, DEFAULT, ?, ?, ?, ?, ?)",
+						"INSERT INTO CLICK VALUES (DEFAULT, ?, DEFAULT, ?, ?, ?, ?, ?, ?)",
 						Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, cl.getHash());
 				ps.setString(2, cl.getBrowser());
@@ -150,6 +150,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 				ps.setString(4, cl.getIp());
 				ps.setString(5, cl.getCountry());
 				ps.setString(6, cl.getCountryCode());
+				ps.setLong(7, cl.getLantency());
 				return ps;
 			}, holder);
 			if ((Long)holder.getKeys().get("id") != null) {

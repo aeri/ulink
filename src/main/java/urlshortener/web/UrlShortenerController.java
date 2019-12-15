@@ -64,6 +64,7 @@ public class UrlShortenerController {
 
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
     public ModelAndView redirectTo(@PathVariable String id, HttpServletRequest request) {
+        long start = System.currentTimeMillis();
         log.info(id);
         ShortURL l = shortUrlService.findByKey(id);
 
@@ -93,7 +94,8 @@ public class UrlShortenerController {
             }
 
             String notSafe = "";
-            clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser);
+            long end = System.currentTimeMillis();
+            clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser, end - start);
 
             if (!l.getSafe()) {
                 ModelAndView modelAndView = new ModelAndView("warning");

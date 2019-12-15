@@ -12,9 +12,10 @@ public class Click {
     private String ip;
     private String country;
     private String countryCode;
+    private long latency;
 
     public Click(Long id, String hash, Date created,
-                 String browser, String platform, String ip, String country, String countryCode) {
+                 String browser, String platform, String ip, String country, String countryCode, long latency) {
         this.id = id;
         this.hash = hash;
         this.created = created;
@@ -23,6 +24,7 @@ public class Click {
         this.ip = ip;
         this.country = country;
         this.countryCode = countryCode;
+        this.latency = latency;
     }
 
     public Long getId() {
@@ -55,5 +57,9 @@ public class Click {
 
     public String getCountryCode() {
         return countryCode;
+    }
+
+    public long getLantency() {
+        return latency;
     }
 }
