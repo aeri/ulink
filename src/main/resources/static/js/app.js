@@ -8,18 +8,26 @@ $(document).ready(
                     type: "POST",
                     url: "/link",
                     data: $(this).serialize(),
+                    statusCode: {
+                        504: function (msg) {
+                            $("#result").html("<div> </div>");
+                            $("#qr-code").html("<div> </div>");
+                            $("#confirmationModal").modal();
+                            $('.modal-backdrop').remove();
+                        },
+                    },
                     success: function (msg) {
-                        $("[data-dismiss=modal]").trigger({ type: "click" });
-                        $("#result").html(
-                            "<div class='alert alert-success lead'><a target='_blank' href='"
-                            + msg.uri
-                            + "'>"
-                            + msg.uri
-                            + "</a></div>"
-                            + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link stadistics</font>"
-                            + "<br><strong><font size='5'>"
-                            + msg.code
-                            + "</font></strong></div>");
+                            $("[data-dismiss=modal]").trigger({ type: "click" });
+                            $("#result").html(
+                                "<div class='alert alert-success lead'><a target='_blank' href='"
+                                + msg.uri
+                                + "'>"
+                                + msg.uri
+                                + "</a></div>"
+                                + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link stadistics</font>"
+                                + "<br><strong><font size='5'>"
+                                + msg.code
+                                + "</font></strong></div>");
                         
                             $.ajax({
                                 type: "GET",

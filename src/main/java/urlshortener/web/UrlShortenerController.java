@@ -16,6 +16,9 @@ import io.ipinfo.api.IPInfo;
 import io.ipinfo.api.errors.RateLimitedException;
 import io.ipinfo.api.model.IPResponse;
 import javax.servlet.http.HttpServletRequest;
+
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -124,9 +127,14 @@ public class UrlShortenerController {
             CheckGSB checkGSB = new CheckGSB();
             String notSafe;
             try {
-                log.debug(url);
-                notSafe = checkGSB.check(url);
-            } catch (GeneralSecurityException | IOException e1) {
+				log.debug(url);
+				notSafe = checkGSB.check(url);
+			}
+			catch(GoogleJsonResponseException e){
+				log.debug("Google Safe Browsing quota exceeded");
+				notSafe = "";
+			}
+			catch (GeneralSecurityException | IOException e1) {
                 e1.printStackTrace();
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -155,13 +163,18 @@ public class UrlShortenerController {
                 if (e.getRawStatusCode() == 404) {
                     log.debug("Peticion incorrecta HttpClientErrorException");
                     ShortURL su = new ShortURL(url, false);
-                    return new ResponseEntity<>(su, h, HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
                 } else {
                     ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
                     h.setLocation(su.getUri());
                     log.debug("Peticion correcta");
                     return new ResponseEntity<>(su, h, HttpStatus.CREATED);
                 }
+            } catch(NullPointerException e){
+                log.debug(e.getMessage());
+                log.debug("Fallo al guardar url en la base");
+                ShortURL su = new ShortURL(url, false);
+                return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
