@@ -21,7 +21,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	private static final Logger log = LoggerFactory.getLogger(ShortURLRepositoryImpl.class);
 
 	private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> new ShortURL(rs.getString("hash"),
-			rs.getString("target"), null, rs.getDate("created"), rs.getBoolean("safe"), rs.getString("ip"),
+			rs.getString("target"), null, rs.getDate("created"), rs.getString("safe"), rs.getString("ip"),
 			rs.getString("code"));
 
 	private JdbcTemplate jdbc;
@@ -77,7 +77,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	}
 
 	@Override
-	public ShortURL mark(ShortURL su, boolean safeness) {
+	public ShortURL mark(ShortURL su, String safeness) {
 		try {
 			jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness, su.getHash());
 			ShortURL res = new ShortURL();

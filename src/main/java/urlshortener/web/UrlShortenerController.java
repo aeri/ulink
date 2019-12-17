@@ -110,14 +110,12 @@ public class UrlShortenerController {
                 log.debug("RateLimitedException");
                 // Handle rate limits here.
             }
-
-            String notSafe = "";
             long end = System.currentTimeMillis();
             clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser, end - start);
 
-            if (!l.getSafe()) {
+            if (l.getSafe() != "") {
                 ModelAndView modelAndView = new ModelAndView("warning");
-                modelAndView.addObject("malware", notSafe);
+                modelAndView.addObject("malware", l.getSafe());
                 modelAndView.addObject("link", l.getTarget());
                 return modelAndView;
 

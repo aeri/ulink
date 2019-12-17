@@ -84,6 +84,9 @@ public class GetStats {
 
 			return hmap;
 		});
+		
+		CompletableFuture<Void> combinedFuture 
+		  = CompletableFuture.allOf(countryList, browsersList, platformsList, totalURL, totalClicks );
 
 		CompletableFuture<HashMap<String, String>> averageLatency = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
