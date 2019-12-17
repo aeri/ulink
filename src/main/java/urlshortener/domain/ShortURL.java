@@ -9,13 +9,13 @@ public class ShortURL {
     private String target;
     private URI uri;
     private Date created;
-    private Boolean safe;
+    private String safe;
     private String ip;
     private Boolean confirmed;
     private String code;
 
     public ShortURL(String hash, String target, URI uri,
-                    Date created, Boolean safe, String ip,
+                    Date created, String safe, String ip,
                     String code) {
         this.hash = hash;
         this.target = target;
@@ -57,7 +57,7 @@ public class ShortURL {
         return created;
     }
 
-    public Boolean getSafe() {
+    public String getSafe() {
         return safe;
     }
 

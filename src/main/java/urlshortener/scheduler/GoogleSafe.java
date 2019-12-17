@@ -36,13 +36,13 @@ public class GoogleSafe {
 
 		for (ShortURL s : listURL) {
 			try {
-				Boolean safe = s.getSafe(); 
+				String safe = s.getSafe();
 				String result = gsb.check(s.getTarget());
 				log.debug(s.getTarget());
 				
-				if (safe && !result.equals("") || !safe && result.equals("")) {
+				if (safe!="" && !result.equals("") || safe==""   && result.equals("")) {
 					log.debug("Changed: "+ s.getTarget());
-					shortUrlService.mark(s, !safe);
+					shortUrlService.mark(s, result);
 				}
 				
 			}

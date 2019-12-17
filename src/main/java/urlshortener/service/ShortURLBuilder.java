@@ -12,7 +12,7 @@ public class ShortURLBuilder {
     private String target;
     private URI uri;
     private Date created;
-    private Boolean safe;
+    private String safe;
     private String ip;
     private String code;
 
@@ -50,7 +50,7 @@ public class ShortURLBuilder {
 
 
     ShortURLBuilder treatAsSafe(String safe) {
-        this.safe = (safe == "");
+        this.safe = safe;
         return this;
     }
 
