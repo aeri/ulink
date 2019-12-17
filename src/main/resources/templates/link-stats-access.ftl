@@ -14,7 +14,7 @@
 <body>
   <div class="col-lg-12 text-center">
       <h1>ulink</h1>
-      <p class="lead">Access to your link stadistics</p>
+      <p class="lead">Access to your link statistics</p>
       <br>
       <form action="/linkStats" class="form" method = "post" id="linkStats">
           <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
@@ -29,7 +29,7 @@
           <em><font size="3" color="red">${failedAccess}</font></em>
           <br>
           <br>
-          <button type="submit" class="btn btn-lg btn-primary">See stadistics</button>
+          <button type="submit" class="btn btn-lg btn-primary">See statistics</button>
       </form>
   </div>
 </body>

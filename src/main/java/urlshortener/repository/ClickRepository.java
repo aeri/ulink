@@ -5,6 +5,7 @@ import urlshortener.domain.Click;
 import urlshortener.domain.Country;
 import urlshortener.domain.Platform;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface ClickRepository {
@@ -36,4 +37,6 @@ public interface ClickRepository {
     List<Browser> retrieveBrowsersGlobal();
 
     List<Platform> retrievePlatformsGlobal();
+
+    Long retrieveAverageLatency(Timestamp since);
 }

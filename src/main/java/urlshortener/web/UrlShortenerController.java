@@ -22,9 +22,14 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -44,6 +49,9 @@ public class UrlShortenerController {
     @Autowired
     private Environment EN_US_PATH;
 
+    @Autowired
+    private Environment LATENCY_PERIOD;
+
     private static Pattern pDomainNameOnly;
     private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
 
@@ -60,6 +68,16 @@ public class UrlShortenerController {
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
         this.clickService = clickService;
+    }
+
+    public static boolean validateHTTP_URI(String uri) {
+        final URL url;
+        try {
+            url = new URL(uri);
+        } catch (Exception e1) {
+            return false;
+        }
+        return "http".equals(url.getProtocol()) || "https".equals(url.getProtocol());
     }
 
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
@@ -83,7 +101,7 @@ public class UrlShortenerController {
 
                 log.debug("Redirection requested from " + request.getRemoteAddr());
 
-                 IPResponse response = ipInfo.lookupIP(request.getRemoteAddr());
+                IPResponse response = ipInfo.lookupIP(request.getRemoteAddr());
 
                 // Print out the country code
                 countryName = response.getCountryName();
@@ -116,53 +134,56 @@ public class UrlShortenerController {
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-                                              @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
-        UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https", "ftp"});
+    public ResponseEntity<ShortURL> shortener(@RequestParam(value = "url", required = true) String url,
+            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+        UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
 
-        if (isValidDomainName(url)) {
+        if (!validateHTTP_URI(url)) {
             url = "http://" + url;
         }
 
-        if (urlValidator.isValid(url)) {
+
+            final String toU = url;
+
             HttpHeaders h = new HttpHeaders();
+
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+            RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
+                    .setReadTimeout(Duration.ofMillis(700)).build();
+            HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
+
+            CompletableFuture<ResponseEntity<String>> fResponse = CompletableFuture.supplyAsync(() -> {
+
+                try {
+                    return getResponse(rest, toU, requestEntity);
+                } catch (SocketTimeoutException | HttpClientErrorException e) {
+                    //e.printStackTrace();
+                    log.info(e.getMessage());
+                    log.info("Peticion incorrecta Timeout");
+                    return new ResponseEntity<String>(h, HttpStatus.GATEWAY_TIMEOUT);
+                }
+            });
+
+            
             CheckGSB checkGSB = new CheckGSB();
             String notSafe;
             try {
-				log.debug(url);
-				notSafe = checkGSB.check(url);
-			}
-			catch(GoogleJsonResponseException e){
-				log.debug("Google Safe Browsing quota exceeded");
-				notSafe = "";
-			}
-			catch (GeneralSecurityException | IOException e1) {
+                log.debug(url);
+                notSafe = checkGSB.check(url);
+            } catch (GoogleJsonResponseException e) {
+                log.debug("Google Safe Browsing quota exceeded");
+                notSafe = "";
+            } catch (GeneralSecurityException | IOException e1) {
                 e1.printStackTrace();
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
             }
             try {
-                RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-                RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
-                        .setReadTimeout(Duration.ofMillis(700)).build();
-                HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
-                ResponseEntity<String> response = getResponse(rest, url, requestEntity);
-
+                ResponseEntity<String> response;
+                response = fResponse.get();
                 log.debug("Status code: " + response.getStatusCode());
-                ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
-                h.setLocation(su.getUri());
-                log.debug("Peticion correcta");
-                return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 
-            } catch (SocketTimeoutException | ResourceAccessException e) { // Timeout OR Unknown host
-                log.debug(e.getMessage());
-                log.debug("Peticion incorrecta Timeout");
-                ShortURL su = new ShortURL(url, false);
-                return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
-
-            } catch (HttpClientErrorException e) { // Client error
-                log.debug(e.getMessage());
-                if (e.getRawStatusCode() == 404) {
+                if (response.getStatusCode() == HttpStatus.GATEWAY_TIMEOUT) {
                     log.debug("Peticion incorrecta HttpClientErrorException");
                     ShortURL su = new ShortURL(url, false);
                     return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
@@ -172,15 +193,20 @@ public class UrlShortenerController {
                     log.debug("Peticion correcta");
                     return new ResponseEntity<>(su, h, HttpStatus.CREATED);
                 }
-            } catch(NullPointerException e){
+
+            } catch (ResourceAccessException e) { // Timeout OR Unknown host
                 log.debug(e.getMessage());
-                log.debug("Fallo al guardar url en la base");
+                log.debug("Peticion incorrecta Timeout");
+                ShortURL su = new ShortURL(url, false);
+                return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
+
+            } catch(NullPointerException | InterruptedException | ExecutionException e){
+                log.info(e.getMessage());
+                log.info("Fallo al guardar url en la base");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
     }
 
     ResponseEntity<String> getResponse(RestTemplate rest, String url, HttpEntity<String> requestEntity)
@@ -223,10 +249,12 @@ public class UrlShortenerController {
         return request.getRemoteAddr();
     }
 
-    @GetMapping("/stadistics")
-    public ModelAndView stadistics(HttpServletRequest request) throws Throwable {
+    @GetMapping("/statistics")
+    public ModelAndView statistics(HttpServletRequest request) throws Throwable {
         GetStats getStats = new GetStats();
-        return getStats.getGlobal(clickService, shortUrlService);
+        String minutes = LATENCY_PERIOD.getProperty("metric.latency.period");
+        Timestamp since = new Timestamp(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Long.parseLong(minutes)));
+        return getStats.getGlobal(clickService, shortUrlService, since);
     }
 
     @GetMapping("/link-stats-access")

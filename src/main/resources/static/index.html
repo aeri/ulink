@@ -1,85 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ulink</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"
-          type="text/css"/>
-    <script src="webjars/jquery/2.1.4/jquery.min.js" type="text/javascript"></script>
-    <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"
-            type="text/javascript"></script>
-    <script src="js/app.js" type="text/javascript">
-    </script>
+<title>ulink</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css"
+	rel="stylesheet" type="text/css" />
+<script src="webjars/jquery/2.1.4/jquery.min.js" type="text/javascript"></script>
+<script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"
+	type="text/javascript"></script>
+<script src="js/app.js" type="text/javascript">
+	
+</script>
 
-    <link rel="stylesheet" media="screen" href="css/background.css">
+<link rel="stylesheet" media="screen" href="css/background.css">
+
+<link
+	href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+	rel="stylesheet">
 
 </head>
+
+
 <body>
 
-<div id="particles-js"></div>
-<div class="container-full" id="form">
-    <div class="row">
-        <div class="col-lg-12 text-center">
-            <h1 style="color: white">ulink</h1>
-            <p class="lead" style="color: white">A powerful url shortener</p>
-            <br>
-            <form action="" class="col-lg-12" id="shortener" role="form">
-                <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-                    <input class="center-block form-control input-lg" name="url"
-                           placeholder="Enter a URL" title="Enter a URL" type="text">
-                    <span class="input-group-btn"><button
-                            class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 text-center">
-            <div class="col-sm-offset-4 col-sm-4 text-center">
-                <br/>
-                <div id="result">
-                </div>
-            </div>
-        </div>
-        <div id="qr-code"></div>
-        <br>
-        <div class="container-full">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-                        <span class="input-group-btn"><a href="./stadistics"
-                                                         class="btn btn-lg btn-info" type="button">Global stadistics</a></span>
-                    </div>
-                    <br>
-                    <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-                        <span class="input-group-btn"><a href="./link-stats-access"
-                                                         class="btn btn-lg btn-info" type="button">Link stadistics</a></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div id="particles-js"></div>
+	<div class="container-full" id="form">
+		<div class="row">
+			<div class="col-lg-12 text-center">
+				<img src="images/logo.svg" alt="ulink" height="100px" />
+				<p class="lead" style="color: white">The url shortener made for
+					<a href="https://github.com/aeri/ulink">people</a>, not for business</p>
+				<br>
+				<form action="" class="col-lg-12" id="shortener" role="form">
+					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+						<input class="center-block form-control input-lg" name="url"
+							placeholder="Enter a URL" title="Enter a URL" type="text">
+						<span class="input-group-btn"><button
+								class="btn btn-lg btn-primary" type="submit"><i class="icon-cut"></i></button></span>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 text-center">
+				<div class="col-sm-offset-4 col-sm-4 text-center">
+					<br />
+					<div id="result"></div>
+				</div>
+			</div>
+			<div id="qr-code"></div>
+			<br>
+			<div class="container-full">
+				<div class="row">
 
-<script src="js/particles.js"></script>
-<script src="js/background.js"></script>
+					<div class="col-lg-12 text-center">
 
-<div class='modal' id='confirmationModal' tabindex='-1' role='dialog'>
-    <div class='modal-dialog' role='document'>
-    <div class='modal-content'>
-    <div class='modal-header'>
-    <h3 class='modal-title'>Warning</h3>
-    </div>
-    <div class='modal-body'>
-    <p><font size='3'>Submitted URL may not be reachable. Do you still want to shorten it?</font></p>
-    </div>
-    <div class='modal-footer'>
-    <form action='' class='col-lg-12' id='shortenerConfirm' role='form'>
-    <button type='button' class='btn btn-secondary' data-dismiss='modal'>Cancel</button>
-    <button type='submit' class='btn btn-primary'>Confirm</button>
-    </form>
-    </div>
-    </div>
-    </div>
-    </div>
+						<a class="btn btn-link" style="color: white" href="./statistics" > <i
+							class="icon-ok-circle icon-large" ></i> System Status
+						</a>
+						
+						&nbsp;&nbsp;&nbsp;
+						
+						<a class="btn btn-link" style="color: white" href="./link-stats-access"> <i
+							class="icon-bar-chart icon-large"></i> Link Stats
+						</a>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="js/particles.js"></script>
+		<script src="js/background.js"></script>
+
+		<div class='modal' id='confirmationModal' tabindex='-1' role='dialog'>
+			<div class='modal-dialog' role='document'>
+				<div class='modal-content'>
+					<div class='modal-header'>
+						<h3 class='modal-title'>Warning</h3>
+					</div>
+					<div class='modal-body'>
+						<p>
+							<font size='3'>Submitted URL may not be reachable. Do you
+								still want to shorten it?</font>
+						</p>
+					</div>
+					<div class='modal-footer'>
+						<form action='' class='col-lg-12' id='shortenerConfirm'
+							role='form'>
+							<button type='button' class='btn btn-secondary'
+								data-dismiss='modal'>Cancel</button>
+							<button type='submit' class='btn btn-primary'>Confirm</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 </body>
 </html>

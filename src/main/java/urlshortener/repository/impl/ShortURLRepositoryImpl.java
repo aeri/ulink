@@ -2,14 +2,12 @@ package urlshortener.repository.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import urlshortener.domain.Browser;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
 

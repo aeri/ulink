@@ -14,7 +14,7 @@
 
 <div style="text-align:center;">
   <p style="font-size:120px;">
-    Stadistics of ${url}
+    statistics of ${url}
   </p>
 </div>
 

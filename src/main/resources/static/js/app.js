@@ -24,7 +24,7 @@ $(document).ready(
                                 + "'>"
                                 + msg.uri
                                 + "</a></div>"
-                                + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link stadistics</font>"
+                                + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link statistics</font>"
                                 + "<br><strong><font size='5'>"
                                 + msg.code
                                 + "</font></strong></div>");
@@ -61,7 +61,7 @@ $(document).ready(
                         + "'>"
                         + msg.uri
                         + "</a></div>"
-                        + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link stadistics</font>"
+                        + "<div class='alert alert-info' role='alert'><font size='3'>Here is the code to access your link statistics</font>"
                         + "<br><strong><font size='5'>"
                         + msg.code
                         + "</font></strong></div>");
@@ -84,12 +84,12 @@ $(document).ready(
                 }
             });
         });
-        $("#stadistics").submit(
+        $("#statistics").submit(
             function (event) {
                 event.preventDefault();
                 $.ajax({
                     type: "GET",
-                    url: "/stadistics",
+                    url: "/statistics",
                     success: function (msg) { 
                             
                     },

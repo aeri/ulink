@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Global stadistics</title>
+  <title>Global statistics</title>
   <#include "css/style_playforms.css">
 
 </head>
@@ -15,7 +15,7 @@
 
 <div style="text-align:center;">
   <p style="font-size:120px;">
-    Global stadistics
+    Global statistics
   </p>
 </div>
 
@@ -41,6 +41,18 @@
         </span>
       </p>
     </div>
+
+    <div style="text-align:center;">
+      <p>
+        <span style="font-size:110px; margin-top: 20px;">
+          ${averageTime}
+        </span>
+        <span style="font-size:35px;">
+          ms avg redirect time
+        </span>
+      </p>
+    </div>
+
   </div>
 
 
