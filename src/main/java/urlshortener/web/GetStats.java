@@ -84,9 +84,6 @@ public class GetStats {
 
 			return hmap;
 		});
-		
-		CompletableFuture<Void> combinedFuture 
-		  = CompletableFuture.allOf(countryList, browsersList, platformsList, totalURL, totalClicks );
 
 		CompletableFuture<HashMap<String, String>> averageLatency = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
@@ -100,6 +97,12 @@ public class GetStats {
 
 			return hmap;
 		});
+
+
+
+		CompletableFuture<Void> combinedFuture
+				= CompletableFuture.allOf(countryList, browsersList, platformsList, totalURL,  totalClicks, averageLatency );
+
 
 		Map<String, String> hmap = Stream.of(countryList, browsersList, platformsList, totalURL, totalClicks, averageLatency)
 				.map(CompletableFuture::join).flatMap(m -> m.entrySet().stream())
@@ -168,6 +171,10 @@ public class GetStats {
 
 				return hmap;
 			});
+
+			CompletableFuture<Void> combinedFuture
+					= CompletableFuture.allOf(countryList, browsersList, platformsList);
+
 
 			modelAndView = new ModelAndView("map");
 			modelAndView.addObject("url", hashId);

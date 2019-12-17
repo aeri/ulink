@@ -58,7 +58,7 @@ public class GoogleSafe {
 
 	}
 
-	@Scheduled(cron = "* */30 * * * *")
+	@Scheduled(cron = "* * */10 * * *")
 	public void check() {
 		int offset = 0;
 		List<ShortURL> listURL = shortUrlService.retrieveUrls(LIMIT, offset);
