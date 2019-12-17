@@ -83,6 +83,9 @@ public class GetStats {
 
 			return hmap;
 		});
+		
+		CompletableFuture<Void> combinedFuture 
+		  = CompletableFuture.allOf(countryList, browsersList, platformsList, totalURL, totalClicks );
 
 		Map<String, String> hmap = Stream.of(countryList, browsersList, platformsList, totalURL, totalClicks)
 				.map(CompletableFuture::join).flatMap(m -> m.entrySet().stream())
