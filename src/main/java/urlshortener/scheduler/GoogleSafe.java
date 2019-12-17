@@ -40,7 +40,7 @@ public class GoogleSafe {
 				String result = gsb.check(s.getTarget());
 				log.debug(s.getTarget());
 				
-				if (safe!="" && !result.equals("") || safe==""   && result.equals("")) {
+				if (!safe.isEmpty() && !result.equals("") || safe.isEmpty()   && result.equals("")) {
 					log.debug("Changed: "+ s.getTarget());
 					shortUrlService.mark(s, result);
 				}

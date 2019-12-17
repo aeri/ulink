@@ -112,8 +112,7 @@ public class UrlShortenerController {
             }
             long end = System.currentTimeMillis();
             clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser, end - start);
-
-            if (l.getSafe() != "") {
+            if (!l.getSafe().isEmpty()) {
                 ModelAndView modelAndView = new ModelAndView("warning");
                 modelAndView.addObject("malware", l.getSafe());
                 modelAndView.addObject("link", l.getTarget());
