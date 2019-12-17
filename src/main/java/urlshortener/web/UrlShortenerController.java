@@ -200,9 +200,14 @@ public class UrlShortenerController {
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
 
-            } catch(NullPointerException | InterruptedException | ExecutionException e){
+            } catch(NullPointerException e){
                 log.info(e.getMessage());
                 log.info("Fallo al guardar url en la base");
+                ShortURL su = new ShortURL(url, false);
+                return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch(InterruptedException | ExecutionException e){
+                log.info(e.getMessage());
+                log.info("Error HTTP asincrono");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
             }
