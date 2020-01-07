@@ -221,7 +221,7 @@ public class UrlShortenerController {
                 log.info(e.getMessage());
                 log.info("Error HTTP asincrono");
                 ShortURL su = new ShortURL(url, false);
-                return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
             }
 
     }
