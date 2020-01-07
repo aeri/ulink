@@ -89,19 +89,24 @@ public class UrlShortenerController {
         IPInfo ipInfo;
         String countryName = null;
         String countryCode = null;
-        String userAgent = request.getHeader("User-Agent");
-        String platform = platformService.getPlatform(userAgent);
-        String browser = browserService.getBrowser(userAgent);
+
+        String platform;
+        String browser;
+
+        try {
+            String userAgent = request.getHeader("User-Agent");
+            platform = platformService.getPlatform(userAgent);
+            browser = browserService.getBrowser(userAgent);
+        }
+        catch (NullPointerException e){
+            platform = "Unknown";
+            browser = "Unknown";
+        }
 
         if (l != null) {
 
             try {
-                ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
-                        .setCountryFile(new File(EN_US_PATH.getProperty("path.en_us"))).build();
-
-                log.debug("Redirection requested from " + request.getRemoteAddr());
-
-                IPResponse response = ipInfo.lookupIP(request.getRemoteAddr());
+                IPResponse response = getIpResponse(request);
 
                 // Print out the country code
                 countryName = response.getCountryName();
@@ -127,6 +132,16 @@ public class UrlShortenerController {
             model.setStatus(HttpStatus.NOT_FOUND);
             return model;
         }
+    }
+
+    IPResponse getIpResponse(HttpServletRequest request) throws RateLimitedException {
+        IPInfo ipInfo;
+        ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
+                .setCountryFile(new File(EN_US_PATH.getProperty("path.en_us"))).build();
+
+        log.debug("Redirection requested from " + request.getRemoteAddr());
+
+        return ipInfo.lookupIP(request.getRemoteAddr());
     }
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)

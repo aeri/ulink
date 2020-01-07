@@ -25,7 +25,7 @@ public class ShortURLRepositoryTests {
     @Before
     public void setup() {
         db = new EmbeddedDatabaseBuilder().setType(H2)
-                .addScript("run.sql").setName("testdb;DATABASE_TO_UPPER=false;MODE=PostgreSQL").build();
+                .addScript("run.sql").setName("testdb;MODE=PostgreSQL").build();
         jdbc = new JdbcTemplate(db);
         repository = new ShortURLRepositoryImpl(jdbc);
     }
@@ -42,16 +42,16 @@ public class ShortURLRepositoryTests {
     public void thatSaveSafe() {
         assertNotNull(repository.save(urlSafe()));
         assertSame(
-                jdbc.queryForObject("select safe from SHORTURL", Boolean.class),
-                true);
-        repository.mark(urlSafe(), false);
+                jdbc.queryForObject("select safe from SHORTURL", String.class),
+                null);
+        repository.mark(urlSafe(), "false");
         assertSame(
-                jdbc.queryForObject("select safe from SHORTURL", Boolean.class),
-                false);
-        repository.mark(urlSafe(), true);
+                jdbc.queryForObject("select safe from SHORTURL", String.class),
+                "false");
+        repository.mark(urlSafe(), "");
         assertSame(
-                jdbc.queryForObject("select safe from SHORTURL", Boolean.class),
-                true);
+                jdbc.queryForObject("select safe from SHORTURL", String.class),
+                "");
     }
 
     @Test

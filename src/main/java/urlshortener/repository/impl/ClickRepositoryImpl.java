@@ -29,7 +29,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	private static final RowMapper<Click> rowMapper = (rs, rowNum) -> new Click(rs.getLong("id"), rs.getString("hash"),
 			rs.getDate("created"), rs.getString("browser"), rs.getString("platform"), rs.getString("ip"),
-			rs.getString("country"), rs.getString("countryCode"), rs.getLong("latency"));
+			rs.getString("country"), rs.getString("gc"), rs.getLong("latency"));
 
 	private static final RowMapper<Country> coMapper = (rs, rowNum) -> new Country(rs.getString("gc"),
 			rs.getString("country"), rs.getInt("count"));

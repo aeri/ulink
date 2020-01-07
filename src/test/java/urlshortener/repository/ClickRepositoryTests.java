@@ -2,6 +2,7 @@ package urlshortener.repository;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -11,6 +12,7 @@ import urlshortener.fixtures.ClickFixture;
 import urlshortener.fixtures.ShortURLFixture;
 import urlshortener.repository.impl.ClickRepositoryImpl;
 import urlshortener.repository.impl.ShortURLRepositoryImpl;
+import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 
 import static org.junit.Assert.*;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.HSQL;
@@ -23,7 +25,13 @@ public class ClickRepositoryTests {
 
     @Before
     public void setup() {
-        jdbc = new JdbcTemplate();
+        /*
+        db = new EmbeddedDatabaseBuilder().setType(HSQL)
+                .addScript("schema-hsqldb.sql").build();*/
+        db = new EmbeddedDatabaseBuilder().setType(H2)
+                .addScript("run.sql").setName("testdb;MODE=PostgreSQL").build();
+
+        jdbc = new JdbcTemplate(db);
         ShortURLRepository shortUrlRepository = new ShortURLRepositoryImpl(jdbc);
         shortUrlRepository.save(ShortURLFixture.url1());
         shortUrlRepository.save(ShortURLFixture.url2());

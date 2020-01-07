@@ -8,7 +8,7 @@ CREATE TABLE SHORTURL
     HASH    VARCHAR(30) PRIMARY KEY,                    -- Key
     TARGET  VARCHAR(1024),                              -- Original URL
     CREATED TIMESTAMP default current_timestamp,        -- Creation date
-    SAFE    BOOLEAN,                                    -- Safe target
+    SAFE    VARCHAR(30),                                -- Safe target
     IP      VARCHAR(20),                                -- IP
     CODE    VARCHAR(50)                                 -- Access code
 );
@@ -25,5 +25,6 @@ CREATE TABLE CLICK
     IP       VARCHAR(20),
     COUNTRY  VARCHAR(50),
     GC       VARCHAR(2),
+    LATENCY  INTEGER,
     FOREIGN KEY (HASH) REFERENCES SHORTURL (HASH)
 )

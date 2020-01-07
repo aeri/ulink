@@ -1,5 +1,6 @@
 package urlshortener.web;
 
+import io.ipinfo.api.model.IPResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -57,6 +58,8 @@ public class UrlShortenerTests {
     public void thatRedirecToReturnsNotFoundIdIfKeyDoesNotExist()
             throws Exception {
         when(shortUrlService.findByKey("someKey")).thenReturn(null);
+        when(shortUrlService.findByKey("someKey")).thenReturn(null);
+
 
         mockMvc.perform(get("/{id}", "someKey")).andDo(print())
                 .andExpect(status().isNotFound());
@@ -101,7 +104,7 @@ public class UrlShortenerTests {
 
     @Test
     public void thatShortenerFailsIfTheRepositoryReturnsNull() throws Exception {
-        when(shortUrlService.save(any(String.class), any(String.class)))
+        when(shortUrlService.save(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(null);
 
         mockMvc.perform(post("/link").param("url", "someKey")).andDo(print())
@@ -109,11 +112,11 @@ public class UrlShortenerTests {
     }
 
     private void configureSave(String sponsor) {
-        when(shortUrlService.save(any(), any()))
+        when(shortUrlService.save(any(), any(), any()))
                 .then((Answer<ShortURL>) invocation -> new ShortURL(
                         "f684a3c4",
                         "http://example.com/",
                         URI.create("http://localhost/f684a3c4"),
-                                                null, null, null, null));
+                                                null, "example", "127.0.0.1", null));
     }
 }

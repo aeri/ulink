@@ -37,6 +37,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.httpcomponents:httpclient'
     compile 'com.google.apis:google-api-services-safebrowsing:v4-rev107-1.25.0'
+
+    compile 'com.h2database:h2'
 }
 
 clean.doFirst {
