@@ -50,7 +50,7 @@ public class GoogleSafe {
 				log.debug("Google Safe Browsing quota exceeded");
 			}
 			catch (GeneralSecurityException | IOException e) {
-				// TODO Auto-generated catch block
+				log.debug("Google Safe Browsing general failed");
 				e.printStackTrace();
 			}
 			

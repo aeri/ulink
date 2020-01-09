@@ -2,7 +2,6 @@ package urlshortener.repository;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -15,7 +14,6 @@ import urlshortener.repository.impl.ShortURLRepositoryImpl;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 
 import static org.junit.Assert.*;
-import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.HSQL;
 
 public class ClickRepositoryTests {
 

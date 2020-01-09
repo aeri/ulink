@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import urlshortener.domain.*;
 import urlshortener.repository.ClickRepository;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
