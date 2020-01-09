@@ -289,7 +289,9 @@ public class UrlShortenerController {
         String minutes = LATENCY_PERIOD.getProperty("metric.latency.period");
         Timestamp since = new Timestamp(
                 System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Long.parseLong(minutes)));
-        return getStats.getGlobal(clickService, shortUrlService, since);
+		ModelAndView modelAndView = new ModelAndView("statistics");
+		modelAndView.addAllObjects(getStats.getGlobal(clickService, shortUrlService, since));
+		return modelAndView;
     }
 
     @GetMapping("/link-stats-access")
@@ -304,9 +306,22 @@ public class UrlShortenerController {
     @PostMapping("/linkStats")
     public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl, @RequestParam("code") String code)
             throws Throwable {
-        GetStats getStats = new GetStats();
-        return getStats.getLocal(clickService, shortUrlService, shortenedUrl, code);
-
+        ModelAndView modelAndView;
+		String hashId = shortenedUrl.substring(shortenedUrl.lastIndexOf('/') + 1);
+		ShortURL l = shortUrlService.findByKeyCode(hashId, code);
+        // Check authentication
+		if (l == null) {
+			modelAndView = new ModelAndView("link-stats-access");
+			modelAndView.addObject("failedAccess", "Incorrect shortened URL or code");
+			modelAndView.setStatus(HttpStatus.FORBIDDEN);
+        }
+        else{
+            modelAndView = new ModelAndView("link-stats");
+		    modelAndView.addObject("url", hashId);
+            GetStats getStats = new GetStats();
+            modelAndView.addAllObjects(getStats.getLocal(clickService, shortUrlService, hashId));
+        }
+        return modelAndView;
     }
 
     @ResponseBody

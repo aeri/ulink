@@ -23,11 +23,8 @@ public class GetStats {
 
 	private static final Logger log = LoggerFactory.getLogger(GetStats.class);
 
-	public ModelAndView getGlobal(ClickService clickService, ShortURLService shortUrlService, Timestamp since)
+	public Map<String, String> getGlobal(ClickService clickService, ShortURLService shortUrlService, Timestamp since)
 			throws Throwable {
-
-		ModelAndView modelAndView;
-
 		// Countries
 		CompletableFuture<HashMap<String, String>> countryList = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
@@ -97,102 +94,57 @@ public class GetStats {
 
 		CompletableFuture.allOf(countryList, browsersList, platformsList, totalURL, totalClicks, averageLatency);
 
-		Map<String, String> hmap = Stream
+		return Stream
 				.of(countryList, browsersList, platformsList, totalURL, totalClicks, averageLatency)
 				.map(CompletableFuture::join).flatMap(m -> m.entrySet().stream())
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-		modelAndView = new ModelAndView("statistics");
-
-		modelAndView.addAllObjects(hmap);
-
-		log.debug("DISPATCH");
-
-		return modelAndView;
-
 	}
 
-	public ModelAndView getLocal(ClickService clickService, ShortURLService shortUrlService, String shortenedUrl,
-			String code) throws Throwable {
+	public Map<String, String> getLocal(ClickService clickService, ShortURLService shortUrlService,
+		String hashId) throws Throwable {
+		CompletableFuture<HashMap<String, String>> countryList = CompletableFuture.supplyAsync(() -> {
+			HashMap<String, String> hmap = new HashMap<String, String>();
+			Gson gson = new Gson();
+			String rjsC = "";
 
-		ModelAndView modelAndView;
+			rjsC = gson.toJson(clickService.retrieveCountries(hashId));
+			log.debug(rjsC);
 
-		String hashId = shortenedUrl.substring(shortenedUrl.lastIndexOf('/') + 1);
+			hmap.put("mapdata", rjsC);
 
-		ShortURL l = shortUrlService.findByKeyCode(hashId, code);
+			return hmap;
+		});
+		// Browsers
+		CompletableFuture<HashMap<String, String>> browsersList = CompletableFuture.supplyAsync(() -> {
+			HashMap<String, String> hmap = new HashMap<String, String>();
+			Gson gson = new Gson();
+			String rjsC = "";
 
-		if (l == null) {
-			modelAndView = new ModelAndView("link-stats-access");
-			modelAndView.addObject("failedAccess", "Incorrect shortened URL or code");
-			modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+			rjsC = gson.toJson(clickService.retrieveBrowsers(hashId));
+			log.debug(rjsC);
 
-		else {
-			CompletableFuture<HashMap<String, String>> countryList = CompletableFuture.supplyAsync(() -> {
-				HashMap<String, String> hmap = new HashMap<String, String>();
-				Gson gson = new Gson();
-				String rjsC = "";
+			hmap.put("browsersdata", rjsC);
 
-				rjsC = gson.toJson(clickService.retrieveCountries(hashId));
-				log.debug(rjsC);
+			return hmap;
+		});
+		CompletableFuture<HashMap<String, String>> platformsList = CompletableFuture.supplyAsync(() -> {
+			HashMap<String, String> hmap = new HashMap<String, String>();
+			Gson gson = new Gson();
+			String rjsC = "";
 
-				hmap.put("mapdata", rjsC);
+			rjsC = gson.toJson(clickService.retrievePlatforms(hashId));
+			log.debug(rjsC);
 
-				return hmap;
-			});
-			// Browsers
-			CompletableFuture<HashMap<String, String>> browsersList = CompletableFuture.supplyAsync(() -> {
-				HashMap<String, String> hmap = new HashMap<String, String>();
-				Gson gson = new Gson();
-				String rjsC = "";
+			hmap.put("platformdata", rjsC);
 
-				rjsC = gson.toJson(clickService.retrieveBrowsers(hashId));
-				log.debug(rjsC);
+			return hmap;
+		});
 
-				hmap.put("browsersdata", rjsC);
+		CompletableFuture.allOf(countryList, browsersList, platformsList);
 
-				return hmap;
-			});
-			CompletableFuture<HashMap<String, String>> platformsList = CompletableFuture.supplyAsync(() -> {
-				HashMap<String, String> hmap = new HashMap<String, String>();
-				Gson gson = new Gson();
-				String rjsC = "";
+		return Stream.of(countryList, browsersList, platformsList).map(CompletableFuture::join)
+				.flatMap(m -> m.entrySet().stream()).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
-				rjsC = gson.toJson(clickService.retrievePlatforms(hashId));
-				log.debug(rjsC);
-
-				hmap.put("platformdata", rjsC);
-
-				return hmap;
-			});
-
-			CompletableFuture.allOf(countryList, browsersList, platformsList);
-
-			modelAndView = new ModelAndView("map");
-			modelAndView.addObject("url", hashId);
-
-			Map<String, String> hmap = Stream.of(countryList, browsersList, platformsList).map(CompletableFuture::join)
-					.flatMap(m -> m.entrySet().stream()).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-			modelAndView.addAllObjects(hmap);
-
-		}
-
-		/*
-		 * 
-		 * ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-		 * 
-		 * 
-		 * for (Long threadID : threadMXBean.getAllThreadIds()) { ThreadInfo info =
-		 * threadMXBean.getThreadInfo(threadID); log.debug("Thread name: " +
-		 * info.getThreadName()); log.debug("Thread State: " + info.getThreadState());
-		 * log.debug(String.format("CPU time: %s ns",
-		 * threadMXBean.getThreadCpuTime(threadID))); }
-		 */
-
-		log.debug("DISPATCH");
-
-		return modelAndView;
 
 	}
 

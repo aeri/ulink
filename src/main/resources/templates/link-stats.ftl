@@ -2,7 +2,7 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>amCharts V4:  Map (simple, step 4)</title>
+  <title>Link statistics</title>
   <#include "css/style_playforms.css">
 </head>
 <body style=" color:White;">
