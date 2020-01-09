@@ -14,20 +14,21 @@ import org.springframework.web.servlet.View;
 
 import urlshortener.domain.ShortURL;
 import urlshortener.service.*;
-import io.ipinfo.api.IPInfo;
+
 import io.ipinfo.api.errors.RateLimitedException;
 import io.ipinfo.api.model.IPResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.sql.Timestamp;
 import java.time.Duration;
+
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -178,7 +179,8 @@ public class UrlShortenerController {
             String notSafe;
             try {
                 log.debug(url);
-                notSafe = checkGSB.check(url);
+                // Check url in Google Safe Browsing
+                notSafe = checkGSB.checkSingleUrl(url);
             } catch (GoogleJsonResponseException e) {
                 log.debug("Google Safe Browsing quota exceeded");
                 notSafe = "";
@@ -249,8 +251,14 @@ public class UrlShortenerController {
             CheckGSB checkGSB = new CheckGSB();
             String notSafe;
             try {
-                notSafe = checkGSB.check(url);
-            } catch (GeneralSecurityException | IOException e1) {
+                // Check url in Google Safe Browsing
+                notSafe = checkGSB.checkSingleUrl(url);
+            } 
+            catch (GoogleJsonResponseException e) {
+                log.debug("Google Safe Browsing quota exceeded");
+                notSafe = "";
+            }
+            catch (GeneralSecurityException | IOException e1) {
                 e1.printStackTrace();
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);

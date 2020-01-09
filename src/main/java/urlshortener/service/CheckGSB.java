@@ -1,17 +1,5 @@
 package urlshortener.service;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -22,6 +10,16 @@ import com.google.api.services.safebrowsing.model.FindThreatMatchesResponse;
 import com.google.api.services.safebrowsing.model.ThreatEntry;
 import com.google.api.services.safebrowsing.model.ThreatInfo;
 import com.google.api.services.safebrowsing.model.ThreatMatch;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CheckGSB {
@@ -48,11 +46,9 @@ public class CheckGSB {
 		key = GOOGLE_API_KEY.getProperty("google.api_key");
 	}
 
-	public String check(String url) throws GeneralSecurityException, IOException {
+	public List<ThreatMatch> check(List<String> urls) throws GeneralSecurityException, IOException {
 
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-
-		List<String> urls = Arrays.asList(url);
 
 		FindThreatMatchesRequest findThreatMatchesRequest = createFindThreatMatchesRequest(urls);
 
@@ -62,7 +58,11 @@ public class CheckGSB {
 		
 		FindThreatMatchesResponse findThreatMatchesResponse = safebrowsing.threatMatches()
 				.find(findThreatMatchesRequest).setKey(key).execute();
-		List<ThreatMatch> threatMatches = findThreatMatchesResponse.getMatches();
+		return findThreatMatchesResponse.getMatches();
+	}
+
+	public String checkSingleUrl(String url) throws GeneralSecurityException, IOException {
+		List<ThreatMatch> threatMatches = check(Arrays.asList(url));
 		if (threatMatches != null && threatMatches.size() > 0) {
 			return threatMatches.get(0).getThreatType();
 		}
