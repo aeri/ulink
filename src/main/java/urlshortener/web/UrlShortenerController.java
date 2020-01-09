@@ -14,24 +14,21 @@ import org.springframework.web.servlet.View;
 
 import urlshortener.domain.ShortURL;
 import urlshortener.service.*;
-import io.ipinfo.api.IPInfo;
+
 import io.ipinfo.api.errors.RateLimitedException;
 import io.ipinfo.api.model.IPResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.services.safebrowsing.model.ThreatMatch;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -47,12 +44,8 @@ public class UrlShortenerController {
     private final ClickService clickService;
     private final PlatformService platformService = new PlatformService();
     private final BrowserService browserService = new BrowserService();
+    private final GetIPInfo getIPInfo = new GetIPInfo();
 
-    @Autowired
-    private Environment IPINFO_TOKEN;
-
-    @Autowired
-    private Environment EN_US_PATH;
 
     @Autowired
     private Environment LATENCY_PERIOD;
@@ -109,15 +102,24 @@ public class UrlShortenerController {
         if (l != null) {
 
             try {
-                IPResponse response = getIpResponse(request);
+                log.info("ABC");
+                IPResponse response = getIPInfo.getIpResponse(request.getRemoteAddr());
+
 
                 // Print out the country code
                 countryName = response.getCountryName();
                 countryCode = response.getCountryCode();
-            } catch (RateLimitedException ex) {
+            } catch (NullPointerException e) {
+                log.debug("Failed to retrieve IP file");
+                ModelAndView model = new ModelAndView("error500");
+                model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                return model;
+            }
+            catch (RateLimitedException | IOException ex) {
                 log.debug("RateLimitedException");
                 // Handle rate limits here.
             }
+
             long end = System.currentTimeMillis();
             clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser, end - start);
             if (!l.getSafe().isEmpty()) {
@@ -139,15 +141,6 @@ public class UrlShortenerController {
         }
     }
 
-    IPResponse getIpResponse(HttpServletRequest request) throws RateLimitedException {
-        IPInfo ipInfo;
-        ipInfo = IPInfo.builder().setToken(IPINFO_TOKEN.getProperty("ipinfo.token"))
-                .setCountryFile(new File(EN_US_PATH.getProperty("path.en_us"))).build();
-
-        log.debug("Redirection requested from " + request.getRemoteAddr());
-
-        return ipInfo.lookupIP(request.getRemoteAddr());
-    }
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     @ResponseBody

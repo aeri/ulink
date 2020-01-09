@@ -1,4 +1,4 @@
-package urlshortener.web;
+package urlshortener.service;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -11,14 +11,14 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 
 import urlshortener.domain.ShortURL;
-import urlshortener.service.ClickService;
-import urlshortener.service.ShortURLService;
 
+@Service
 public class GetStats {
 
 	private static final Logger log = LoggerFactory.getLogger(GetStats.class);
