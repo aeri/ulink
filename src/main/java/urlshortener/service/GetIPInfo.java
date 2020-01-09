@@ -39,6 +39,9 @@ public class GetIPInfo {
     private static final Logger log = LoggerFactory.getLogger(UrlShortenerController.class);
 
 
+    /**
+     * 
+     */
     @PostConstruct
     public void init() {
         token = IPINFO_TOKEN.getProperty("ipinfo.token");
@@ -47,6 +50,13 @@ public class GetIPInfo {
     }
 
 
+    /**
+     * 
+     * @param addr
+     * @return
+     * @throws RateLimitedException
+     * @throws IOException
+     */
     public IPResponse getIpResponse(String addr) throws RateLimitedException, IOException {
         log.info("BCD");
         ipInfo = IPInfo.builder().setToken(token)

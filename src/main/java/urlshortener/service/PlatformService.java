@@ -7,9 +7,16 @@ public class PlatformService {
     public PlatformService() {
     }
 
+    /**
+     * Decodes platform (OS) from browser details string
+     * 
+     * Code based on:
+     * <https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser>
+     * 
+     * @param browserDetails string containing browser details
+     * @return platform (OS)
+     */
     public String getPlatform(String browserDetails) {
-        // Code based on:
-        // https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser
         String userAgent = browserDetails.toLowerCase();
         if (userAgent.indexOf("windows") >= 0) {
             return "Windows";

@@ -68,6 +68,13 @@ public class UrlShortenerController {
         this.clickService = clickService;
     }
 
+    /**
+     * Checks if a provided URI is valid
+     * 
+     * @param uri URI that is going to be validated
+     * @return true if URI is valid, false otherwise
+     */
+
     public static boolean validateHTTP_URI(String uri) {
         final URL url;
         try {
@@ -78,18 +85,27 @@ public class UrlShortenerController {
         return "http".equals(url.getProtocol()) || "https".equals(url.getProtocol());
     }
 
+    /**
+     * Given a shortened url redirects  the user to the original url
+     * <p>
+     * This method checks using Google Safe Browsing if original url
+     * is save. If it is, redirects the user. If it is not, redirects
+     * to a page that informs the using about the danger. If an error
+     * occurs, it returns a page showing the specific error.
+     * 
+     * @param id shortened url provided
+     * @param request HttpServletRequest request
+     * @return ModelAndView containing redirection page or error
+     */
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
     public ModelAndView redirectTo(@PathVariable String id, HttpServletRequest request) {
         long start = System.currentTimeMillis();
         log.info(id);
         ShortURL l = shortUrlService.findByKey(id);
-
         String countryName = null;
         String countryCode = null;
-
         String platform;
         String browser;
-
         try {
             String userAgent = request.getHeader("User-Agent");
             platform = platformService.getPlatform(userAgent);
@@ -98,15 +114,10 @@ public class UrlShortenerController {
             platform = "Unknown";
             browser = "Unknown";
         }
-
         if (l != null) {
-
             try {
                 log.info("ABC");
                 IPResponse response = getIPInfo.getIpResponse(request.getRemoteAddr());
-
-
-                // Print out the country code
                 countryName = response.getCountryName();
                 countryCode = response.getCountryCode();
             } catch (NullPointerException e) {
@@ -117,9 +128,7 @@ public class UrlShortenerController {
             }
             catch (RateLimitedException | IOException ex) {
                 log.debug("RateLimitedException");
-                // Handle rate limits here.
             }
-
             long end = System.currentTimeMillis();
             clickService.saveClick(id, extractIP(request), countryName, countryCode, platform, browser, end - start);
             if (!l.getSafe().isEmpty()) {
@@ -127,13 +136,10 @@ public class UrlShortenerController {
                 modelAndView.addObject("malware", l.getSafe());
                 modelAndView.addObject("link", l.getTarget());
                 return modelAndView;
-
             } else {
                 request.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
-
                 return new ModelAndView("redirect:" + l.getTarget());
             }
-
         } else {
             ModelAndView model = new ModelAndView("error");
             model.setStatus(HttpStatus.NOT_FOUND);
@@ -142,29 +148,37 @@ public class UrlShortenerController {
     }
 
 
+    /**
+     * Shorts the url provided
+     * <p>
+     * Checks if the provided url is reachable, if it is,
+     * returns the shortened url to the user. If it is not,
+     * informs the user about it so he/she can confirm that
+     * wants to shorten the url. It also checks if url is safe
+     * using Google Safe Browsing. If an error occurs, it 
+     * returns a page showing the specific error.
+     * 
+     * @param url link that is going to be shortened
+     * @param request HttpServletRequest request
+     * @return ResponseEntity containing ShortUrl object
+     */
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<ShortURL> shortener(@RequestParam(value = "url", required = true) String url,
-            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+            HttpServletRequest request) {
 
         UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
         HttpHeaders h = new HttpHeaders();
-
         if (!validateHTTP_URI(url)) {
             url = "http://" + url;
         }
-
         if (urlValidator.isValid(url)) {
-
             final String toU = url;
-
             RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
             RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
                     .setReadTimeout(Duration.ofMillis(700)).build();
             HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
-
             CompletableFuture<ResponseEntity<String>> fResponse = CompletableFuture.supplyAsync(() -> {
-
                 try {
                     return getResponse(rest, toU, requestEntity);
                 } catch (SocketTimeoutException | HttpClientErrorException e) {
@@ -174,7 +188,6 @@ public class UrlShortenerController {
                     return new ResponseEntity<String>(h, HttpStatus.GATEWAY_TIMEOUT);
                 }
             });
-
             CheckGSB checkGSB = new CheckGSB();
             String notSafe;
             try {
@@ -193,7 +206,6 @@ public class UrlShortenerController {
                 ResponseEntity<String> response;
                 response = fResponse.get();
                 log.debug("Status code: " + response.getStatusCode());
-
                 if (response.getStatusCode() == HttpStatus.GATEWAY_TIMEOUT) {
                     log.debug("Peticion incorrecta HttpClientErrorException");
                     ShortURL su = new ShortURL(url, false);
@@ -204,13 +216,11 @@ public class UrlShortenerController {
                     log.debug("Peticion correcta");
                     return new ResponseEntity<>(su, h, HttpStatus.CREATED);
                 }
-
             } catch (ResourceAccessException e) { // Timeout OR Unknown host
                 log.debug(e.getMessage());
                 log.debug("Peticion incorrecta Timeout");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
-
             } catch (NullPointerException e) {
                 log.info(e.getMessage());
                 log.info("Fallo al guardar url en la base");
@@ -222,24 +232,38 @@ public class UrlShortenerController {
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
             }
-
         } else {
             ShortURL su = new ShortURL(url, false);
             return new ResponseEntity<>(su, h, HttpStatus.BAD_REQUEST);
         }
-
     }
 
+    /**
+     * Executes a GET HTTP request as a client a returns response
+     * 
+     * @param rest RestTemplate object
+     * @param url server address
+     * @param requestEntity HttpEntity containing a string
+     * @return response from the server
+     * @throws SocketTimeoutException
+     */
     ResponseEntity<String> getResponse(RestTemplate rest, String url, HttpEntity<String> requestEntity)
             throws SocketTimeoutException {
         // Execute http get request as client
         return rest.exchange(url, HttpMethod.GET, requestEntity, String.class);
     }
 
+    /**
+     * Shortens a url, despite it is reachable or not.
+     * 
+     * @param url link that is going to be shortened
+     * @param request HttpServletRequest request
+     * @return ResponseEntity containing ShortUrl object
+     */
     @RequestMapping(value = "/linkConfirm", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<ShortURL> shortenerConfirm(@RequestParam("url") String url,
-            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+            HttpServletRequest request) {
         log.debug("linkConfirm Request");
         UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
 
@@ -266,16 +290,29 @@ public class UrlShortenerController {
             ShortURL su = shortUrlService.save(url, request.getRemoteAddr(), notSafe);
             h.setLocation(su.getUri());
             return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
+    /**
+     * Extracts IP address from a request
+     * 
+     * @param request HttpServletRequest request
+     * @return IP extracted from the request
+     */
     private String extractIP(HttpServletRequest request) {
         return request.getRemoteAddr();
     }
 
+
+    /**
+     * Returns global statistics and global information about the system
+     * 
+     * @param request HttpServletRequest request
+     * @return ModelAndView containing global statistics and information
+     * @throws Throwable
+     */
     @GetMapping("/statistics")
     public ModelAndView statistics(HttpServletRequest request) throws Throwable {
         GetStats getStats = new GetStats();
@@ -287,15 +324,28 @@ public class UrlShortenerController {
 		return modelAndView;
     }
 
+    /**
+     * Returns link statistics access page
+     * 
+     * @param request HttpServletRequest request
+     * @return ModelAndView presenting link stats access page
+     */
     @GetMapping("/link-stats-access")
     public ModelAndView linkStatsAccess(HttpServletRequest request) {
         ModelAndView modelAndView;
         modelAndView = new ModelAndView("link-stats-access");
         modelAndView.addObject("failedAccess", "");
-
         return modelAndView;
     }
 
+    /**
+     * Returns the user statistics about provided shortened url
+     * 
+     * @param shortenedUrl shortened url which stats are going to be returned
+     * @param code access code for the shortened url
+     * @return ModelAndView containing link stats
+     * @throws Throwable
+     */
     @PostMapping("/linkStats")
     public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl, @RequestParam("code") String code)
             throws Throwable {
@@ -317,6 +367,12 @@ public class UrlShortenerController {
         return modelAndView;
     }
 
+    /**
+     * Transforms a url into a QR image
+     * 
+     * @param link shortened url to be transformed to qr
+     * @return response entity containing qr image as byte stream
+     */
     @ResponseBody
     @RequestMapping(value = "/qr", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> qr(@RequestParam("link") String link) {

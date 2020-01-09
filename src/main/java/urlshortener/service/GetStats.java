@@ -7,22 +7,27 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.google.gson.Gson;
 
-import urlshortener.domain.ShortURL;
 
 @Service
 public class GetStats {
 
 	private static final Logger log = LoggerFactory.getLogger(GetStats.class);
 
+
+	/**
+	 * Returns global statistics (browsers, platforms and countries redirections)
+	 * 
+	 * @param clickService ClickService object
+	 * @param shortUrlService ShortURLService object
+	 * @param since Date since statistics are going to be provided
+	 * @return map containing statistics 
+	 * @throws Throwable
+	 */
 	public Map<String, String> getGlobal(ClickService clickService, ShortURLService shortUrlService, Timestamp since)
 			throws Throwable {
 		// Countries
@@ -100,6 +105,17 @@ public class GetStats {
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 	}
 
+
+	/**
+	 * Returns statistics (browsers, platforms and countries redirections)
+	 * about a specific shortened url
+	 * 
+	 * @param clickService ClickService object
+	 * @param shortUrlService ShortURLService object
+	 * @param hashId hash used as shortened url
+	 * @return map containing statistics 
+	 * @throws Throwable
+	 */
 	public Map<String, String> getLocal(ClickService clickService, ShortURLService shortUrlService,
 		String hashId) throws Throwable {
 		CompletableFuture<HashMap<String, String>> countryList = CompletableFuture.supplyAsync(() -> {

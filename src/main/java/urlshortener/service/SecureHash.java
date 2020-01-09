@@ -12,22 +12,23 @@ public class SecureHash {
 	    private static SecureRandom random = new SecureRandom();
 
 
+		/**
+		 * 
+		 * @param length
+		 * @param secure
+		 * @return
+		 */
 	    public String generateRandomString(int length, String secure) {
 	        if (length < 1) throw new IllegalArgumentException();
 
 	        StringBuilder sb = new StringBuilder(length);
 	        for (int i = 0; i < length; i++) {
-
 				// 0-62 (exclusive), random returns 0-61
 	            int rndCharAt = random.nextInt(DATA_FOR_RANDOM_STRING.length());
 	            char rndChar = DATA_FOR_RANDOM_STRING.charAt(rndCharAt);
-
 	            sb.append(rndChar);
-
 	        }
-
 	        return sb.toString();
-
 	    }
 
 	}

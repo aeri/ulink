@@ -41,11 +41,21 @@ public class CheckGSB {
 	public static NetHttpTransport httpTransport;
 	
 
+	/**
+	 * 
+	 */
 	@PostConstruct
 	public void init() {
 		key = GOOGLE_API_KEY.getProperty("google.api_key");
 	}
 
+	/**
+	 * 
+	 * @param urls
+	 * @return
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
 	public List<ThreatMatch> check(List<String> urls) throws GeneralSecurityException, IOException {
 
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -61,6 +71,13 @@ public class CheckGSB {
 		return findThreatMatchesResponse.getMatches();
 	}
 
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
 	public String checkSingleUrl(String url) throws GeneralSecurityException, IOException {
 		List<ThreatMatch> threatMatches = check(Arrays.asList(url));
 		if (threatMatches != null && threatMatches.size() > 0) {
@@ -71,6 +88,11 @@ public class CheckGSB {
 		}
 	}
 
+	/**
+	 * 
+	 * @param urls
+	 * @return
+	 */
 	private FindThreatMatchesRequest createFindThreatMatchesRequest(List<String> urls) {
 		FindThreatMatchesRequest findThreatMatchesRequest = new FindThreatMatchesRequest();
 
