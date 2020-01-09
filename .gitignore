@@ -336,8 +336,6 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-src/test/resources/application.properties
-
 .gradle/buildOutputCleanup/cache.properties
 src/main/resources/application-dev.properties
 src/main/resources/application-heku.properties
