@@ -10,6 +10,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
+
 import urlshortener.domain.ShortURL;
 import urlshortener.service.*;
 import io.ipinfo.api.IPInfo;
@@ -89,7 +91,6 @@ public class UrlShortenerController {
         log.info(id);
         ShortURL l = shortUrlService.findByKey(id);
 
-        IPInfo ipInfo;
         String countryName = null;
         String countryCode = null;
 
@@ -100,8 +101,7 @@ public class UrlShortenerController {
             String userAgent = request.getHeader("User-Agent");
             platform = platformService.getPlatform(userAgent);
             browser = browserService.getBrowser(userAgent);
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             platform = "Unknown";
             browser = "Unknown";
         }
@@ -127,6 +127,8 @@ public class UrlShortenerController {
                 return modelAndView;
 
             } else {
+                request.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
+
                 return new ModelAndView("redirect:" + l.getTarget());
             }
 
@@ -151,16 +153,17 @@ public class UrlShortenerController {
     @ResponseBody
     public ResponseEntity<ShortURL> shortener(@RequestParam(value = "url", required = true) String url,
             @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+
         UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
+        HttpHeaders h = new HttpHeaders();
 
         if (!validateHTTP_URI(url)) {
             url = "http://" + url;
         }
 
+        if (urlValidator.isValid(url)) {
 
             final String toU = url;
-
-            HttpHeaders h = new HttpHeaders();
 
             RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
             RestTemplate rest = restTemplateBuilder.setConnectTimeout(Duration.ofMillis(700))
@@ -172,14 +175,13 @@ public class UrlShortenerController {
                 try {
                     return getResponse(rest, toU, requestEntity);
                 } catch (SocketTimeoutException | HttpClientErrorException e) {
-                    //e.printStackTrace();
+                    // e.printStackTrace();
                     log.info(e.getMessage());
                     log.info("Peticion incorrecta Timeout");
                     return new ResponseEntity<String>(h, HttpStatus.GATEWAY_TIMEOUT);
                 }
             });
 
-            
             CheckGSB checkGSB = new CheckGSB();
             String notSafe;
             try {
@@ -216,17 +218,22 @@ public class UrlShortenerController {
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
 
-            } catch(NullPointerException e){
+            } catch (NullPointerException e) {
                 log.info(e.getMessage());
                 log.info("Fallo al guardar url en la base");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.INTERNAL_SERVER_ERROR);
-            } catch(InterruptedException | ExecutionException e){
+            } catch (InterruptedException | ExecutionException e) {
                 log.info(e.getMessage());
                 log.info("Error HTTP asincrono");
                 ShortURL su = new ShortURL(url, false);
                 return new ResponseEntity<>(su, h, HttpStatus.GATEWAY_TIMEOUT);
             }
+
+        } else {
+            ShortURL su = new ShortURL(url, false);
+            return new ResponseEntity<>(su, h, HttpStatus.BAD_REQUEST);
+        }
 
     }
 
@@ -239,9 +246,9 @@ public class UrlShortenerController {
     @RequestMapping(value = "/linkConfirm", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<ShortURL> shortenerConfirm(@RequestParam("url") String url,
-                                                     @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
         log.debug("linkConfirm Request");
-        UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https", "ftp"});
+        UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https", "ftp" });
 
         if (isValidDomainName(url)) {
             url = "http://" + url;
@@ -280,7 +287,8 @@ public class UrlShortenerController {
     public ModelAndView statistics(HttpServletRequest request) throws Throwable {
         GetStats getStats = new GetStats();
         String minutes = LATENCY_PERIOD.getProperty("metric.latency.period");
-        Timestamp since = new Timestamp(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Long.parseLong(minutes)));
+        Timestamp since = new Timestamp(
+                System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Long.parseLong(minutes)));
         return getStats.getGlobal(clickService, shortUrlService, since);
     }
 
@@ -294,8 +302,8 @@ public class UrlShortenerController {
     }
 
     @PostMapping("/linkStats")
-    public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl, @RequestParam("code") String code,
-                                  HttpServletRequest request) throws Throwable {
+    public ModelAndView linkStats(@RequestParam("shortenedUrl") String shortenedUrl, @RequestParam("code") String code)
+            throws Throwable {
         GetStats getStats = new GetStats();
         return getStats.getLocal(clickService, shortUrlService, shortenedUrl, code);
 

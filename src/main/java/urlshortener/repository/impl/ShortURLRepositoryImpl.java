@@ -80,7 +80,6 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public ShortURL mark(ShortURL su, String safeness) {
 		try {
 			jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness, su.getHash());
-			ShortURL res = new ShortURL();
 			new DirectFieldAccessor(su).setPropertyValue("safe", safeness);
 			return su;
 		} catch (Exception e) {

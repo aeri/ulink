@@ -33,7 +33,7 @@ public class ShortURLFixture {
     }
 
     public static ShortURL someUrl() {
-        return new ShortURL("someKey", "http://example.com/", null, null, null,
+        return new ShortURL("someKey", "http://example.com/", null, null, "",
                 null, "H");
     }
 }

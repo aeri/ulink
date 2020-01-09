@@ -16,7 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.*;

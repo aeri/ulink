@@ -83,11 +83,12 @@ public class GoogleSafe {
 			log.debug("Google Safe Browsing quota exceeded");
 		}
 		catch (GeneralSecurityException | IOException e) {
+			log.debug("Google Safe Browsing general failed");
 			e.printStackTrace();
 		}
 	}
 
-	@Scheduled(cron = "* * */10 * * *")
+	@Scheduled(cron = "0 0/30 * * * *")
 	public void check() {
 		int offset = 0;
 		List<ShortURL> listURL = shortUrlService.retrieveUrls(LIMIT, offset);
