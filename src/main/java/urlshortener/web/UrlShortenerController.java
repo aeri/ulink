@@ -293,7 +293,7 @@ public class UrlShortenerController {
 
     @ResponseBody
     @RequestMapping(value = "/qr", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<String> qr(@RequestParam("link") String link) {
+    public ResponseEntity<byte[]> qr(@RequestParam("link") String link) {
         HttpHeaders h = new HttpHeaders();
         RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
 
@@ -301,9 +301,7 @@ public class UrlShortenerController {
                 .setReadTimeout(Duration.ofMillis(2000)).build();
         HttpEntity<String> requestEntity = new HttpEntity<String>("", h);
         String url = "https://chart.googleapis.com/chart?cht=qr&chl=" + link + "&chs=160x160&chld=L|0";
-        ResponseEntity<byte[]> response = rest.exchange(url, HttpMethod.GET, requestEntity, byte[].class);
-        String base64 = Base64.getEncoder().encodeToString(response.getBody());
-        return new ResponseEntity<String>(base64, HttpStatus.OK);
+        return rest.exchange(url, HttpMethod.GET, requestEntity, byte[].class);
     }
 
 }

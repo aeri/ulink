@@ -28,16 +28,9 @@ $(document).ready(
                                 + "<br><strong><font size='5'>"
                                 + msg.code
                                 + "</font></strong></div>");
-                        
-                            $.ajax({
-                                type: "GET",
-                                url: `/qr/?link=${msg.uri}`,
-                                success: function (resQR) {
-                                    $('#qr-code').html(
-                                        "<div class='text-center'>" +
-                                        `<img src="data:image/png;base64,${resQR}" class='qr-code img-thumbnail img-responsive' /> </div>`);
-                                }
-                            });
+                            $('#qr-code').html(
+                                "<div class='text-center'>" +
+                                `<img src="/qr/?link=${msg.uri}" class='qr-code img-thumbnail img-responsive' /> </div>`);
                     },
                     error: function () {
                         $("[data-dismiss=modal]").trigger({ type: "click" });
@@ -65,16 +58,9 @@ $(document).ready(
                         + "<br><strong><font size='5'>"
                         + msg.code
                         + "</font></strong></div>");
-                    
-                        $.ajax({
-                            type: "GET",
-                            url: `/qr/?link=${msg.uri}`,
-                            success: function (resQR) {
-                                $('#qr-code').html(
-                                    "<div class='text-center'>" +
-                                    `<img src="data:image/png;base64,${resQR}" class='qr-code img-thumbnail img-responsive' /> </div>`);
-                            }
-                        });
+                        $('#qr-code').html(
+                            "<div class='text-center'>" +
+                            `<img src="/qr/?link=${msg.uri}" class='qr-code img-thumbnail img-responsive' /> </div>`);
                 },
                 error: function () {
                     $("[data-dismiss=modal]").trigger({ type: "click" });
