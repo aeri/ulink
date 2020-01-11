@@ -13,17 +13,16 @@ public class SecureHash {
 
 
 		/**
+		 * Generates recursively a random string of size 'length'
 		 * 
-		 * @param length
-		 * @param secure
-		 * @return
+		 * @param length final length of the string
+		 * @return random string
 		 */
-	    public String generateRandomString(int length, String secure) {
+	    public String generateRandomString(int length) {
 	        if (length < 1) throw new IllegalArgumentException();
 
 	        StringBuilder sb = new StringBuilder(length);
 	        for (int i = 0; i < length; i++) {
-				// 0-62 (exclusive), random returns 0-61
 	            int rndCharAt = random.nextInt(DATA_FOR_RANDOM_STRING.length());
 	            char rndChar = DATA_FOR_RANDOM_STRING.charAt(rndCharAt);
 	            sb.append(rndChar);

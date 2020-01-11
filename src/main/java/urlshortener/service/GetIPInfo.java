@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import urlshortener.web.UrlShortenerController;
@@ -15,7 +14,6 @@ import urlshortener.web.UrlShortenerController;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 @Service
 public class GetIPInfo {
@@ -40,7 +38,7 @@ public class GetIPInfo {
 
 
     /**
-     * 
+     * Gets environment variables from properties files
      */
     @PostConstruct
     public void init() {
@@ -51,9 +49,10 @@ public class GetIPInfo {
 
 
     /**
+     * Gets information about a specific IP
      * 
-     * @param addr
-     * @return
+     * @param addr target IP address
+     * @return information about provided address
      * @throws RateLimitedException
      * @throws IOException
      */

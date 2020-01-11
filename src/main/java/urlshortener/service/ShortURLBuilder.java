@@ -35,7 +35,7 @@ public class ShortURLBuilder {
     ShortURLBuilder target(String url) {
         target = url;
         SecureHash rand= new SecureHash();
-        hash = rand.generateRandomString(6, url);
+        hash = rand.generateRandomString(6);
         return this;
     }
 
@@ -64,7 +64,7 @@ public class ShortURLBuilder {
 
     ShortURLBuilder code() {
         SecureHash rand= new SecureHash();
-        code = rand.generateRandomString(4, null);
+        code = rand.generateRandomString(4);
         return this;
     }
 

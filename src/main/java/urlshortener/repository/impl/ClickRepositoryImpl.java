@@ -58,9 +58,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public List<Country> retrieveCountries(String hash) {
-
-		System.out.println(hash);
-
+		log.debug("Retrieving countries: " + hash);
 		try {
 			return jdbc.query(
 					"SELECT COUNT(id), country, gc FROM click WHERE hash=? GROUP BY country,gc ORDER BY COUNT(id) DESC",
@@ -73,9 +71,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public List<Browser> retrieveBrowsers(String hash) {
-
-		System.out.println(hash);
-
+		log.debug("Retrieving browsers: " + hash);
 		try {
 			return jdbc.query(
 					"SELECT COUNT(id), browser FROM click WHERE hash=? GROUP BY browser ORDER BY COUNT(id) DESC",
@@ -88,9 +84,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public List<Platform> retrievePlatforms(String hash) {
-
-		System.out.println(hash);
-
+		log.debug("Retrieving platforms: " + hash);
 		try {
 			return jdbc.query(
 					"SELECT COUNT(id), platform FROM click WHERE hash=? GROUP BY platform ORDER BY COUNT(id) DESC",
@@ -103,7 +97,6 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public List<Country> retrieveCountriesGlobal() {
-
 		try {
 			return jdbc.query("SELECT COUNT(id), country, gc FROM click GROUP BY country,gc ORDER BY COUNT(id) DESC",
 					coMapper);
@@ -115,7 +108,6 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public List<Browser> retrieveBrowsersGlobal() {
-
 		try {
 			return jdbc.query("SELECT COUNT(id), browser FROM click GROUP BY browser ORDER BY COUNT(id) DESC",
 					boMapper);
@@ -127,7 +119,6 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public List<Platform> retrievePlatformsGlobal() {
-
 		try {
 			return jdbc.query("SELECT COUNT(id), platform FROM click GROUP BY platform ORDER BY COUNT(id) DESC",
 					ptMapper);

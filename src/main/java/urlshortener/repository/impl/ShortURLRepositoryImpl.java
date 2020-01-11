@@ -32,7 +32,6 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	@Override
 	public List<ShortURL> retrieveUrls(int limit, int offset) {
-
 		try {
 			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?", new Object[] { limit, offset }, rowMapper);
 		} catch (Exception e) {
@@ -62,7 +61,6 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	@Override
 	public ShortURL save(ShortURL su) {
-
 		try {
 			jdbc.update("INSERT INTO shorturl VALUES (?,?,DEFAULT,?,?,?)", su.getHash(), su.getTarget(), su.getSafe(),
 					su.getIP(), su.getCode());

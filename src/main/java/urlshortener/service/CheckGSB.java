@@ -42,7 +42,7 @@ public class CheckGSB {
 	
 
 	/**
-	 * 
+	 * Gets environment variables from properties file
 	 */
 	@PostConstruct
 	public void init() {
@@ -50,9 +50,10 @@ public class CheckGSB {
 	}
 
 	/**
+	 * Checks a list of URLs safetiness using Google Safe Browsing
 	 * 
-	 * @param urls
-	 * @return
+	 * @param urls list of urls that are going to be checked
+	 * @return resulting list of THreadMatch
 	 * @throws GeneralSecurityException
 	 * @throws IOException
 	 */
@@ -72,9 +73,10 @@ public class CheckGSB {
 	}
 
 	/**
+	 * Checks a URL safetiness using Google Safe Browsing
 	 * 
-	 * @param url
-	 * @return
+	 * @param url url that is going to be checked
+	 * @return if url is safe, returns empty string, if not, a threat code
 	 * @throws GeneralSecurityException
 	 * @throws IOException
 	 */
@@ -89,9 +91,10 @@ public class CheckGSB {
 	}
 
 	/**
+	 * Builds a request to GSB from a list of strings (URLs)
 	 * 
-	 * @param urls
-	 * @return
+	 * @param urls URLs that are going to be checked
+	 * @return a FindThreatMatchesRequest entity
 	 */
 	private FindThreatMatchesRequest createFindThreatMatchesRequest(List<String> urls) {
 		FindThreatMatchesRequest findThreatMatchesRequest = new FindThreatMatchesRequest();

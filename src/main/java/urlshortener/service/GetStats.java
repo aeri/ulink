@@ -20,11 +20,12 @@ public class GetStats {
 
 
 	/**
-	 * Returns global statistics (browsers, platforms and countries redirections)
+	 * Returns global statistics (browsers, platforms and countries redirections,
+	 * total number of shortened URLs and redirections and avg redirection latency)
 	 * 
 	 * @param clickService ClickService object
 	 * @param shortUrlService ShortURLService object
-	 * @param since Date since statistics are going to be provided
+	 * @param since Date since avg redirection time stats are going to be provided
 	 * @return map containing statistics 
 	 * @throws Throwable
 	 */
@@ -56,6 +57,7 @@ public class GetStats {
 
 			return hmap;
 		});
+		// Platforms
 		CompletableFuture<HashMap<String, String>> platformsList = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
 			Gson gson = new Gson();
@@ -68,7 +70,7 @@ public class GetStats {
 
 			return hmap;
 		});
-
+		// Total number of shortened URLs
 		CompletableFuture<HashMap<String, String>> totalURL = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
 
@@ -76,7 +78,7 @@ public class GetStats {
 
 			return hmap;
 		});
-
+		// Total number of redirections
 		CompletableFuture<HashMap<String, String>> totalClicks = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
 
@@ -84,7 +86,7 @@ public class GetStats {
 
 			return hmap;
 		});
-
+		// Average redirection time (latency)
 		CompletableFuture<HashMap<String, String>> averageLatency = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
 			try {
@@ -118,6 +120,7 @@ public class GetStats {
 	 */
 	public Map<String, String> getLocal(ClickService clickService, ShortURLService shortUrlService,
 		String hashId) throws Throwable {
+		// Countries
 		CompletableFuture<HashMap<String, String>> countryList = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
 			Gson gson = new Gson();
@@ -143,6 +146,7 @@ public class GetStats {
 
 			return hmap;
 		});
+		// Platforms
 		CompletableFuture<HashMap<String, String>> platformsList = CompletableFuture.supplyAsync(() -> {
 			HashMap<String, String> hmap = new HashMap<String, String>();
 			Gson gson = new Gson();

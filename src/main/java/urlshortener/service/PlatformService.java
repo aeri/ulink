@@ -14,7 +14,7 @@ public class PlatformService {
      * <https://stackoverflow.com/questions/1326928/how-can-i-get-client-information-such-as-os-and-browser>
      * 
      * @param browserDetails string containing browser details
-     * @return platform (OS)
+     * @return platform (OS) used by client
      */
     public String getPlatform(String browserDetails) {
         String userAgent = browserDetails.toLowerCase();

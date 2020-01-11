@@ -22,6 +22,17 @@ public class ClickService {
         this.clickRepository = clickRepository;
     }
 
+    /**
+     * Asynchronously, stores a redirection records in database
+     * 
+     * @param hash
+     * @param ip
+     * @param countryName
+     * @param countryCode
+     * @param platform
+     * @param browser
+     * @param latency
+     */
     @Async
     public void saveClick(String hash, String ip, String countryName, String countryCode, String platform, String browser, long latency) {
         Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip)

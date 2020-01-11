@@ -26,14 +26,16 @@ public class GoogleSafe {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	// private static final SimpleDateFormat dateFormat = new
-	// SimpleDateFormat("HH:mm:ss");
-
 	public GoogleSafe(ShortURLService shortUrlService) {
 		this.gsb = new CheckGSB();
 		this.shortUrlService = shortUrlService;
 	}
 
+	/**
+	 * Checks urls safetiness
+	 * 
+	 * @param listURL list of urls that are going to be checked
+	 */
 	private void checkList(List<ShortURL> listURL) {
 		List<String> listStringURL = new ArrayList<>();
 		// Create list of urls as strings
@@ -88,18 +90,23 @@ public class GoogleSafe {
 		}
 	}
 
+	/**
+	 * Checks all urls safetiness stored in database
+	 * Maximum request size is LIMIT
+	 * 
+	 */
 	@Scheduled(cron = "0 0/30 * * * *")
 	public void check() {
 		int offset = 0;
 		List<ShortURL> listURL = shortUrlService.retrieveUrls(LIMIT, offset);
-		log.info("COMIENZA EL CHECK");
+		log.info("CHECK BEGINS");
 		while (listURL.size() != 0) {
-			log.info("PETICION MULTIPLE A GSB: " + listURL.size() + " URL");
+			log.info("MULTIPLE REQUEST TO GSB: " + listURL.size() + " URL");
 			checkList(listURL);
 			offset=offset+LIMIT;
 			listURL = shortUrlService.retrieveUrls(LIMIT, offset);
 		}
-		log.info("TERMINA EL CHECK");
+		log.info("CHECK FINISHED");
 
 	}
 
