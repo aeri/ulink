@@ -3,7 +3,7 @@
 <br />
 <p align="center">
   <a href="https://ulink.herokuapp.com/">
-    <img src="https://i.imgur.com/uUNRu8K.png" alt="Logo" width="150" height="150">
+    <img src="https://imgur.com/S1Rj4LM.png" alt="Logo" width="150" height="150">
   </a>
 
   <h3 align="center">ulink</h3>
@@ -25,18 +25,30 @@
 <!-- ABOUT THE PROJECT -->
 ## About
 
-A simple and modern URL actor deployed with a docker-compose with a distributed architecture.
+A simple and modern URL shortener deployed with a docker-compose with a distributed architecture.
 
-<!-- GETTING STARTED -->
-### Features
+This shortener is published on the web (Heroku) on the fly with every commit, so you can be sure that the code here is exactly what you use, guaranteeing that the URLs you deposit on the site are yours alone.
 
-* System information. 
-* Statistics of the URL of the client (number of clicks, ranking of origins, browsers and most used platforms of the shortened link).
-* QR code associated with the shortened URI requested by the client.
-* Reachability check before creating a short URL and warning the user if he wants to continue with the generation in case of not being reachable.
-* Check against the Google Safe Browsing service and notify the customer requesting a redirection if the destination is dangerous.
+<!-- FEATURED -->
+### Interesting Features
 
+* [x] Show global system information. 
+* [x] Retrieve statistics of your shortened URL (number of clicks, ranking of origins, browsers and most used platforms of the shortened link).
+* [x] Get a QR code associated with your shortened URL to be published anywhere and access quickly.
+* [x] Reachability check before creating a short URL and warning the user if he wants to continue with the generation in case of not being reachable.
+* [x] Check against the Google Safe Browsing service and notify the customer requesting a redirection if the destination is dangerous.
 
+<!-- ARCH -->
+## Architecture
+
+This is the system overview of docker compose deployment (not app core deployment in Heroku):
+
+![Architecture](https://imgur.com/UGBzwm7.png)
+
+The following projects have been used to achieve this:
+
+* **PostDock** - *Dmitriy Paunin* - [postdock](https://github.com/paunin/PostDock)
+* **dockprom** - *Stefan Prodan* - [dockprom](https://github.com/stefanprodan/dockprom)
 
 <!-- CONTACT -->
 ## Contributors
