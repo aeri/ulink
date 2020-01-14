@@ -59,6 +59,11 @@ public class UrlShortenerController {
         pDomainNameOnly = Pattern.compile(DOMAIN_NAME_PATTERN);
     }
 
+    
+    /** 
+     * @param domainName
+     * @return boolean
+     */
     private static boolean isValidDomainName(String domainName) {
         return pDomainNameOnly.matcher(domainName).find();
     }

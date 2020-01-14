@@ -50,6 +50,10 @@ public class SystemTests {
         assertThat(entity.getBody(), containsString("body"));
     }
 
+    
+    /** 
+     * @throws Exception
+     */
     @Test
     public void testCreateLink() throws Exception {
         ResponseEntity<String> entity = postLink("http://example.com/");
@@ -60,6 +64,11 @@ public class SystemTests {
         assertThat(rc.read("$.target"), is("http://example.com/"));
     }
 
+    
+    /** 
+     * @param url
+     * @return ResponseEntity<String>
+     */
     private ResponseEntity<String> postLink(String url) {
         MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
         parts.add("url", url);

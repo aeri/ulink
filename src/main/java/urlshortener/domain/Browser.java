@@ -11,10 +11,18 @@ public class Browser {
 		this.counter = counter;
 	}
 
+	
+	/** 
+	 * @return String
+	 */
 	public String getName() {
 		return name;
 	}
 
+	
+	/** 
+	 * @return int
+	 */
 	public int getCounter() {
 		return counter;
 	}

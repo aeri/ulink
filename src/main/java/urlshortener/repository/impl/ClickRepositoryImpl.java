@@ -46,6 +46,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		this.jdbc = jdbc;
 	}
 
+	
+	/** 
+	 * @param hash
+	 * @return List<Click>
+	 */
 	@Override
 	public List<Click> findByHash(String hash) {
 		try {
@@ -56,6 +61,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param hash
+	 * @return List<Country>
+	 */
 	@Override
 	public List<Country> retrieveCountries(String hash) {
 		log.debug("Retrieving countries: " + hash);
@@ -69,6 +79,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param hash
+	 * @return List<Browser>
+	 */
 	@Override
 	public List<Browser> retrieveBrowsers(String hash) {
 		log.debug("Retrieving browsers: " + hash);
@@ -82,6 +97,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param hash
+	 * @return List<Platform>
+	 */
 	@Override
 	public List<Platform> retrievePlatforms(String hash) {
 		log.debug("Retrieving platforms: " + hash);
@@ -95,6 +115,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @return List<Country>
+	 */
 	@Override
 	public List<Country> retrieveCountriesGlobal() {
 		try {
@@ -106,6 +130,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @return List<Browser>
+	 */
 	@Override
 	public List<Browser> retrieveBrowsersGlobal() {
 		try {
@@ -117,6 +145,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @return List<Platform>
+	 */
 	@Override
 	public List<Platform> retrievePlatformsGlobal() {
 		try {
@@ -128,6 +160,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param cl
+	 * @return Click
+	 */
 	@Override
 	public Click save(final Click cl) {
 		try {
@@ -160,6 +197,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		return cl;
 	}
 
+	
+	/** 
+	 * @param cl
+	 */
 	@Override
 	public void update(Click cl) {
 		log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.getId(), cl.getBrowser(), cl.getPlatform(),
@@ -175,6 +216,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param id
+	 */
 	@Override
 	public void delete(Long id) {
 		try {
@@ -193,6 +238,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @return Long
+	 */
 	@Override
 	public Long count() {
 		try {
@@ -203,6 +252,12 @@ public class ClickRepositoryImpl implements ClickRepository {
 		return -1L;
 	}
 
+	
+	/** 
+	 * @param limit
+	 * @param offset
+	 * @return List<Click>
+	 */
 	@Override
 	public List<Click> list(Long limit, Long offset) {
 		try {
@@ -213,6 +268,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param hash
+	 * @return Long
+	 */
 	@Override
 	public Long clicksByHash(String hash) {
 		try {
@@ -223,6 +283,11 @@ public class ClickRepositoryImpl implements ClickRepository {
 		return -1L;
 	}
 
+	
+	/** 
+	 * @param since
+	 * @return Long
+	 */
 	@Override
 	public Long retrieveAverageLatency(Timestamp since){
 		try {

@@ -12,11 +12,20 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 public class Application extends SpringBootServletInitializer {
 
+    
+    /** 
+     * @param args
+     */
     public static void main(String[] args) {
 
         SpringApplication.run(Application.class, args);
     }
 
+    
+    /** 
+     * @param application
+     * @return SpringApplicationBuilder
+     */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Application.class);

@@ -41,34 +41,66 @@ public class ShortURL {
     public ShortURL() {
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getHash() {
         return hash;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getTarget() {
         return target;
     }
 
+    
+    /** 
+     * @return URI
+     */
     public URI getUri() {
         return uri;
     }
 
+    
+    /** 
+     * @return Date
+     */
     public Date getCreated() {
         return created;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getSafe() {
         return safe;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getIP() {
         return ip;
     }
 
+    
+    /** 
+     * @return Boolean
+     */
     public Boolean getConfirmed() {
         return confirmed;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getCode() {
         return code;
     }

@@ -16,10 +16,18 @@ public class ShortURLBuilder {
     private String ip;
     private String code;
 
+    
+    /** 
+     * @return ShortURLBuilder
+     */
     static ShortURLBuilder newInstance() {
         return new ShortURLBuilder();
     }
 
+    
+    /** 
+     * @return ShortURL
+     */
     ShortURL build() {
         return new ShortURL(
                 hash,
@@ -32,6 +40,11 @@ public class ShortURLBuilder {
         );
     }
 
+    
+    /** 
+     * @param url
+     * @return ShortURLBuilder
+     */
     ShortURLBuilder target(String url) {
         target = url;
         SecureHash rand= new SecureHash();
@@ -40,28 +53,51 @@ public class ShortURLBuilder {
     }
 
 
+    
+    /** 
+     * @return ShortURLBuilder
+     */
     ShortURLBuilder createdNow() {
         this.created = new Date(System.currentTimeMillis());
         return this;
     }
 
 
+    
+    /** 
+     * @param safe
+     * @return ShortURLBuilder
+     */
     ShortURLBuilder treatAsSafe(String safe) {
         this.safe = safe;
         return this;
     }
 
+    
+    /** 
+     * @param ip
+     * @return ShortURLBuilder
+     */
     ShortURLBuilder ip(String ip) {
         this.ip = ip;
         return this;
     }
 
 
+    
+    /** 
+     * @param extractor
+     * @return ShortURLBuilder
+     */
     ShortURLBuilder uri(Function<String, URI> extractor) {
         this.uri = extractor.apply(hash);
         return this;
     }
 
+    
+    /** 
+     * @return ShortURLBuilder
+     */
     ShortURLBuilder code() {
         SecureHash rand= new SecureHash();
         code = rand.generateRandomString(4);

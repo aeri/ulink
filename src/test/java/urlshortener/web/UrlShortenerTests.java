@@ -37,6 +37,10 @@ public class UrlShortenerTests {
         @MockBean
         private ShortURLService shortUrlService;
 
+        
+        /** 
+         * @throws Exception
+         */
         @Test
         public void thatRedirectToReturnsTemporaryRedirectIfKeyExists() throws Exception {
                 when(shortUrlService.findByKey("someKey")).thenReturn(someUrl());
@@ -45,6 +49,10 @@ public class UrlShortenerTests {
                                 .andExpect(redirectedUrl("http://example.com/"));
         }
 
+        
+        /** 
+         * @throws Exception
+         */
         @Test
         public void thatRedirecToReturnsNotFoundIdIfKeyDoesNotExist() throws Exception {
                 when(shortUrlService.findByKey("someKey")).thenReturn(null);
@@ -53,6 +61,10 @@ public class UrlShortenerTests {
                 mockMvc.perform(get("/{id}", "someKey")).andDo(print()).andExpect(status().isNotFound());
         }
 
+        
+        /** 
+         * @throws Exception
+         */
         @Test
         public void thatShortenerCreatesARedirectIfTheURLisOK() throws Exception {
                 configureSave(null);
@@ -62,6 +74,10 @@ public class UrlShortenerTests {
                                 .andExpect(jsonPath("$.target", is("http://example.com/")));
         }
 
+        
+        /** 
+         * @throws Exception
+         */
         @Test
         public void thatShortenerFailsIfTheURLisWrong() throws Exception {
                 configureSave(null);
@@ -70,6 +86,10 @@ public class UrlShortenerTests {
                                 .andExpect(status().isBadRequest());
         }
 
+        
+        /** 
+         * @throws Exception
+         */
         @Test
         public void thatShortenerFailsIfTheRepositoryReturnsNull() throws Exception {
                 when(shortUrlService.save(any(String.class), any(String.class), any(String.class))).thenReturn(null);
@@ -78,6 +98,10 @@ public class UrlShortenerTests {
                                 .andExpect(status().isBadRequest());
         }
 
+        
+        /** 
+         * @param sponsor
+         */
         private void configureSave(String sponsor) {
                 when(shortUrlService.save(any(), any(), any()))
                                 .then((Answer<ShortURL>) invocation -> new ShortURL("f684a3c4", "http://example.com/",

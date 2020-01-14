@@ -17,11 +17,19 @@ public class PersistenceConfiguration {
         this.jdbc = jdbc;
     }
 
+    
+    /** 
+     * @return ShortURLRepository
+     */
     @Bean
     ShortURLRepository shortURLRepository() {
         return new ShortURLRepositoryImpl(jdbc);
     }
 
+    
+    /** 
+     * @return ClickRepository
+     */
     @Bean
     ClickRepository clickRepository() {
         return new ClickRepositoryImpl(jdbc);

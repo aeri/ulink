@@ -27,38 +27,74 @@ public class Click {
         this.latency = latency;
     }
 
+    
+    /** 
+     * @return Long
+     */
     public Long getId() {
         return id;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getHash() {
         return hash;
     }
 
+    
+    /** 
+     * @return Date
+     */
     public Date getCreated() {
         return created;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getBrowser() {
         return browser;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getPlatform() {
         return platform;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getIp() {
         return ip;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getCountry() {
         return country;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getCountryCode() {
         return countryCode;
     }
 
+    
+    /** 
+     * @return Long
+     */
     public Long getLantency() {
         return latency;
     }

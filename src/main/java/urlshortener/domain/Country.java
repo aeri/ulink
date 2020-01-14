@@ -15,18 +15,34 @@ public class Country {
 		this.fill = "blue";
 	}
 
+	
+	/** 
+	 * @return String
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	
+	/** 
+	 * @return String
+	 */
 	public String getId() {
 		return id;
 	}
 
+	
+	/** 
+	 * @return int
+	 */
 	public int getCounter() {
 		return value;
 	}
 	
+	
+	/** 
+	 * @return String
+	 */
 	public String getFill() {
 		return fill;
 	}

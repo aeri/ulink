@@ -30,6 +30,12 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		this.jdbc = jdbc;
 	}
 
+	
+	/** 
+	 * @param limit
+	 * @param offset
+	 * @return List<ShortURL>
+	 */
 	@Override
 	public List<ShortURL> retrieveUrls(int limit, int offset) {
 		try {
@@ -39,6 +45,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param id
+	 * @return ShortURL
+	 */
 	@Override
 	public ShortURL findByKey(String id) {
 		try {
@@ -49,6 +60,12 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param id
+	 * @param code
+	 * @return ShortURL
+	 */
 	@Override
 	public ShortURL findByKeyCode(String id, String code) {
 		try {
@@ -59,6 +76,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param su
+	 * @return ShortURL
+	 */
 	@Override
 	public ShortURL save(ShortURL su) {
 		try {
@@ -74,6 +96,12 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		return su;
 	}
 
+	
+	/** 
+	 * @param su
+	 * @param safeness
+	 * @return ShortURL
+	 */
 	@Override
 	public ShortURL mark(ShortURL su, String safeness) {
 		try {
@@ -86,6 +114,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param su
+	 */
 	@Override
 	public void update(ShortURL su) {
 		try {
@@ -96,6 +128,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param hash
+	 */
 	@Override
 	public void delete(String hash) {
 		try {
@@ -105,6 +141,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @return Long
+	 */
 	@Override
 	public Long count() {
 		try {
@@ -115,6 +155,12 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		return -1L;
 	}
 
+	
+	/** 
+	 * @param limit
+	 * @param offset
+	 * @return List<ShortURL>
+	 */
 	@Override
 	public List<ShortURL> list(Long limit, Long offset) {
 		try {
@@ -125,6 +171,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	
+	/** 
+	 * @param target
+	 * @return List<ShortURL>
+	 */
 	@Override
 	public List<ShortURL> findByTarget(String target) {
 		try {
