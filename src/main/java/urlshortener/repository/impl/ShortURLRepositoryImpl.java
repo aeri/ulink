@@ -32,6 +32,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Retrieves ShortURL list given limit and offset
+	 * 
 	 * @param limit
 	 * @param offset
 	 * @return List<ShortURL>
@@ -47,6 +49,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Retrieves ShortURL by key
+	 * 
 	 * @param id
 	 * @return ShortURL
 	 */
@@ -62,6 +66,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Retrieves ShortURL by key if code matches
+	 * 
 	 * @param id
 	 * @param code
 	 * @return ShortURL
@@ -78,6 +84,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Save shortened url in database
+	 * 
 	 * @param su
 	 * @return ShortURL
 	 */
@@ -98,6 +106,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Change shortened url safeness property in database
+	 * 
 	 * @param su
 	 * @param safeness
 	 * @return ShortURL
@@ -116,6 +126,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Update shortened url in database
+	 * 
 	 * @param su
 	 */
 	@Override
@@ -130,6 +142,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Delete ShortURL by its shortened url
+	 * 
 	 * @param hash
 	 */
 	@Override
@@ -143,6 +157,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
+	 * Returns number of shortened urls stored in DB
+	 * 
 	 * @return Long
 	 */
 	@Override
@@ -157,22 +173,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 
 	
 	/** 
-	 * @param limit
-	 * @param offset
-	 * @return List<ShortURL>
-	 */
-	@Override
-	public List<ShortURL> list(Long limit, Long offset) {
-		try {
-			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?", new Object[] { limit, offset }, rowMapper);
-		} catch (Exception e) {
-			log.debug("When select for limit {} and offset {}", limit, offset, e);
-			return Collections.emptyList();
-		}
-	}
-
-	
-	/** 
+	 * Retrieve list of ShortURL by target
+	 * 
 	 * @param target
 	 * @return List<ShortURL>
 	 */

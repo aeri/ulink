@@ -48,6 +48,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Click list (redirections) by shortened url
+	 * 
 	 * @param hash
 	 * @return List<Click>
 	 */
@@ -63,6 +65,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Country list (redirections) by shortened url
+	 * 
 	 * @param hash
 	 * @return List<Country>
 	 */
@@ -81,6 +85,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Browser list (redirections) by shortened url
+	 * 
 	 * @param hash
 	 * @return List<Browser>
 	 */
@@ -99,6 +105,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Platform list (redirections) by shortened url
+	 * 
 	 * @param hash
 	 * @return List<Platform>
 	 */
@@ -117,6 +125,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Country list (all redirections)
+	 * 
 	 * @return List<Country>
 	 */
 	@Override
@@ -132,6 +142,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Browser list (all redirections)
+	 * 
 	 * @return List<Browser>
 	 */
 	@Override
@@ -147,6 +159,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Platform list (all redirections)
+	 * 
 	 * @return List<Platform>
 	 */
 	@Override
@@ -162,6 +176,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Stores Click (redirection) in DB
+	 * 
 	 * @param cl
 	 * @return Click
 	 */
@@ -199,6 +215,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Updates Click (redirection) in DB
+	 * 
 	 * @param cl
 	 */
 	@Override
@@ -218,6 +236,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Deletes Click (redirection) by ID in DB
+	 * 
 	 * @param id
 	 */
 	@Override
@@ -229,6 +249,10 @@ public class ClickRepositoryImpl implements ClickRepository {
 		}
 	}
 
+	/**
+	 * Delete all clicks in database
+	 * 
+	 */
 	@Override
 	public void deleteAll() {
 		try {
@@ -240,6 +264,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Returns number of clicks stored in DB
+	 * 
 	 * @return Long
 	 */
 	@Override
@@ -254,6 +280,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Retrieves Click list given limit and offset
+	 * 
 	 * @param limit
 	 * @param offset
 	 * @return List<Click>
@@ -270,6 +298,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Returns Click id by shortened url
+	 * 
 	 * @param hash
 	 * @return Long
 	 */
@@ -285,6 +315,8 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	
 	/** 
+	 * Returns average latency in time range [since, now]
+	 * 
 	 * @param since
 	 * @return Long
 	 */

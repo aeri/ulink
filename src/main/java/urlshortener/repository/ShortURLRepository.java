@@ -20,8 +20,6 @@ public interface ShortURLRepository {
 
     Long count();
 
-    List<ShortURL> list(Long limit, Long offset);
-
 	ShortURL findByKeyCode(String id, String code);
 
 	List<ShortURL> retrieveUrls(int limit, int offset);

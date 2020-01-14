@@ -96,6 +96,8 @@ public class ClickService {
 
     
     /** 
+     * Returns average latency in time range [since, now]
+     * 
      * @param since
      * @return Long
      */
