@@ -1,0 +1,10 @@
+urlshortener
+urlshortener.config
+urlshortener.domain
+urlshortener.fixtures
+urlshortener.integration
+urlshortener.repository
+urlshortener.repository.impl
+urlshortener.scheduler
+urlshortener.service
+urlshortener.web
