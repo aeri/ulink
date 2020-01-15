@@ -50,12 +50,18 @@ The following projects have been used to achieve this:
 * **PostDock** - *Dmitriy Paunin* - [postdock](https://github.com/paunin/PostDock)
 * **dockprom** - *Stefan Prodan* - [dockprom](https://github.com/stefanprodan/dockprom)
 
-<!-- CONTACT -->
-## Contributors
+## Documentation
 
-* [aeri](github.com/aeri)
-* [vpec](github.com/vpec)
-* [javiermixture17](github.com/javiermixture17)
+The full documentation generated with Javadoc for this project is available at the following link:
+
+[Documentation](https://aeri.github.io/ulink/)
+
+<!-- CONTACT -->
+## Creators
+
+* [aeri](https://github.com/aeri)
+* [vpec](https://github.com/vpec)
+* [javiermixture17](https://github.com/javiermixture17)
 
 
 
@@ -63,4 +69,3 @@ The following projects have been used to achieve this:
 ## License
 
 Distributed under GNU General Public License v3.0. See `LICENSE` for more information.
-

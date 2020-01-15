@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import urlshortener.web.UrlShortenerController;
 
@@ -26,10 +25,7 @@ public class GetIPInfo {
     @Autowired
     private Environment EN_US_PATH;
 
-    @Autowired
-    ResourceLoader resourceLoader;
-
-    private File file;
+    private static File file;
 
     public static String token;
     public static String en_us;
@@ -44,7 +40,7 @@ public class GetIPInfo {
     public void init() {
         token = IPINFO_TOKEN.getProperty("ipinfo.token");
         en_us = EN_US_PATH.getProperty("path.en_us");
-        file= new File(en_us);
+        file = new File(en_us);
     }
 
 
@@ -57,7 +53,6 @@ public class GetIPInfo {
      * @throws IOException
      */
     public IPResponse getIpResponse(String addr) throws RateLimitedException, IOException {
-        log.info("BCD");
         ipInfo = IPInfo.builder().setToken(token)
                 .setCountryFile(file).build();
 
