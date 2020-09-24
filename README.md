@@ -3,7 +3,7 @@
 <br />
 <p align="center">
   <a href="https://ulink.herokuapp.com/">
-    <img src="https://imgur.com/S1Rj4LM.png" alt="Logo" width="150" height="150">
+    <img src="https://i.imgur.com/3CcVuZY.png" alt="Logo" width="150" height="150">
   </a>
 
   <h3 align="center">ulink</h3>
