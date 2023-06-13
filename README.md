@@ -2,8 +2,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://ulink.herokuapp.com/">
-    <img src="https://i.imgur.com/3CcVuZY.png" alt="Logo" width="150" height="150">
+    <img src="docs/img/logo.png" alt="Logo" width="150" height="150">
   </a>
 
   <h3 align="center">ulink</h3>
@@ -11,10 +10,6 @@
   <p align="center">
     The url shortener made for people, not for business
     <br />
-    <br />
-    <a href="https://ulink.herokuapp.com/">View Demo</a>
-    ·
-    <a href="https://github.com/aeri/ulink/issues">Report Bug</a>
   </p>
 </p>
 
@@ -43,7 +38,7 @@ This shortener is published on the web (Heroku) on the fly with every commit, so
 
 This is the system overview of docker compose deployment (not app core deployment in Heroku):
 
-![Architecture](https://imgur.com/UGBzwm7.png)
+![Architecture](docs/img/arc.png)
 
 The following projects have been used to achieve this:
 
